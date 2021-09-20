@@ -86,7 +86,7 @@ python3 InverterData.py (or ./InverterData.py)
 ```
 
 # Known Issues
-Probably two byte values (Total production and Total generation time) are not derived correctly (when firs byte value <>0)
+Probably two byte values (Total production and Total generation time) are not derived correctly (when first byte value <>0)
 To be determined ...
 
 # Contrib
