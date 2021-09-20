@@ -1,0 +1,690 @@
+[
+  {
+    "directory": "solar",
+    "items": [
+      {
+        "titleEN": "PV1 Power",
+        "titlePL": "Moc PV1",
+        "registers": ["0x000A"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 10,
+        "unit": "W"
+      },
+      {
+        "titleEN": "PV2 Power",
+        "titlePL": "Moc PV2",
+        "registers": ["0x000B"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 10,
+        "unit": "W"
+      },
+      {
+        "titleEN": "PV1 Voltage",
+        "titlePL": "Napięcie PV1",
+        "registers": ["0x0006"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.1,
+        "unit": "V"
+      },
+      {
+        "titleEN": "PV2 Voltage",
+        "titlePL": "Napięcie PV2",
+        "registers": ["0x0008"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.1,
+        "unit": "V"
+      },
+      {
+        "titleEN": "PV1 Current",
+        "titlePL": "Prąd PV1",
+        "registers": ["0x0007"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.01,
+        "unit": "A"
+      },
+      {
+        "titleEN": "PV2 Current",
+        "titlePL": "Prąd PV2",
+        "registers": ["0x0009"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.01,
+        "unit": "A"
+      },
+      {
+        "titleEN": "Today production",
+        "titlePL": "Dzienna produkcja",
+        "registers": ["0x0019"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.01,
+        "unit": "kWh"
+      },
+      {
+        "titleEN": "Total production",
+        "titlePL": "Całkowita produkcja",
+        "registers": ["0x0015","0x0016"],
+        "parserRule": 2,
+        "optionRanges": [],
+        "ratio": 1,
+        "unit": "kWh"
+      },
+      {
+        "titleEN": "Total generation time",
+        "titlePL": "Całkowity Czas pracy",
+        "registers": ["0x0017","0x0018"],
+        "parserRule": 2,
+        "optionRanges": [],
+        "ratio": 1,
+        "unit": "h"
+      },
+      {
+        "titleEN": "Today generation time",
+        "titlePL": "Dzisiejszy czas pracy",
+        "registers": ["0x001A"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 1,
+        "unit": "min"
+      }
+    ]
+  },
+  {
+    "directory": "Output",
+    "items": [
+      {
+        "titleEN": "Output active power",
+        "titlePL": "Moc czynna",
+        "registers": ["0x000C"],
+        "optionRanges": [],
+        "ratio": 0.01,
+        "unit": "kW"
+      },
+      {
+        "titleEN": "Output reactive power",
+        "titlePL": "Moc bierna",
+        "registers": ["0x000D"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.01,
+        "unit": "kVar"
+      },
+      {
+        "titleEN": "Grid frequency",
+        "titlePL": "Częstotliwość sieci",
+        "registers": ["0x000E"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.01,
+        "unit": "Hz"
+      },
+      {
+        "titleEN": "L1 Voltage",
+        "titlePL": "Napięcie L1",
+        "registers": ["0x000F"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.1,
+        "unit": "V"
+      },
+      {
+        "titleEN": "L1 Current",
+        "titlePL": "Prąd L1",
+        "registers": ["0x0010"],
+        "parserRule": 2,
+        "optionRanges": [],
+        "ratio": 0.01,
+        "unit": "A"
+      },
+      {
+        "titleEN": "L2 Voltage",
+        "titlePL": "Napięcie L2",
+        "registers": ["0x0011"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.1,
+        "unit": "V"
+      },
+      {
+        "titleEN": "L2 Current",
+        "titlePL": "Prąd L2",
+        "registers": ["0x0012"],
+        "parserRule": 2,
+        "optionRanges": [],
+        "ratio": 0.01,
+        "unit": "A"
+      },
+      {
+        "titleEN": "L3 Voltage",
+        "titlePL": "Napięcie L3",
+        "registers": ["0x0013"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.1,
+        "unit": "V"
+      },
+      {
+        "titleEN": "L3 Current",
+        "titlePL": "Prąd L3",
+        "registers": ["0x0014"],
+        "parserRule": 2,
+        "optionRanges": [],
+        "ratio": 0.01,
+        "unit": "A"
+      }
+    ]
+  },
+  {
+    "directory": "Inverter",
+    "items": [
+      {
+        "titleEN": "Inverter status",
+        "titlePL": "Status",
+        "registers": ["0x0000"],
+        "parserRule": 1,
+        "optionRanges": [
+          {
+            "key": 0,
+            "valueEN": "Stand-by",
+            "valuePL": "Oczekiwanie"
+          },
+          {
+            "key": 1,
+            "valueEN": "Self-checking",
+            "valuePL": "Weryfikacja wewn."
+          },
+          {
+            "key": 2,
+            "valueEN": "Normal",
+            "valuePL": "Normalny"
+          },
+          {
+            "key": 3,
+            "valueEN": "FAULT",
+            "valuePL": "BŁĄD"
+          },
+          {
+            "key": 4,
+            "valueEN": "Permanent",
+            "valuePL": "Permanent"
+          }
+
+        ],
+        "ratio": 1,
+        "unit": ""
+      },
+      {
+        "titleEN": "Inverter module temperature",
+        "titlePL": "Temperatura modułu",
+        "registers": ["0x001B"],
+        "parserRule": 2,
+        "optionRanges": [],
+        "ratio": 1,
+        "unit": "ºC"
+      },
+      {
+        "titleEN": "Inverter inner termperature",
+        "titlePL": "Temperatura falownika",
+        "registers": ["0x001C"],
+        "parserRule": 2,
+        "optionRanges": [],
+        "ratio": 1,
+        "unit": "ºC"
+      },
+      {
+        "titleEN": "Inverter bus vultage",
+        "titlePL": "Napięcie szyny falownika",
+        "registers": ["0x001D"],
+        "parserRule": 2,
+        "optionRanges": [],
+        "ratio": 0.1,
+        "unit": "V"
+      },
+      {
+        "titleEN": "PV1 voltage sample by slave CPU",
+        "titlePL": "PV1 voltage sample by slave CPU",
+        "registers": ["0x001E"],
+        "parserRule": 2,
+        "optionRanges": [],
+        "ratio": 0.1,
+        "unit": "V"
+      },
+      {
+        "titleEN": "PV1 current sample by slave CPU",
+        "titlePL": "PV1 current sample by slave CPU",
+        "registers": ["0x001F"],
+        "parserRule": 2,
+        "optionRanges": [],
+        "ratio": 0.1,
+        "unit": "A"
+      }, 
+      {
+        "titleEN": "Countdown time",
+        "titlePL": "Czas próbkowania",
+        "registers": ["0x0020"],
+        "parserRule": 2,
+        "optionRanges": [],
+        "ratio": 1,
+        "unit": "s"
+      },
+      {
+        "titleEN": "Inverter alert message",
+        "titlePL": "Wiadomość alarmowa",
+        "registers": ["0x0021"],
+        "parserRule": 2,
+        "optionRanges": [],
+        "ratio": 1,
+        "unit": ""
+      },
+      {
+        "titleEN": "Input mode",
+        "titlePL": "Input mode",
+        "registers": ["0x0022"],
+        "parserRule": 2,
+        "optionRanges": [],
+        "ratio": 1,
+        "unit": ""
+      },
+      {
+        "titleEN": "Communication Board inner message",
+        "titlePL": "Wewnętrzny komunikat szyny",
+        "registers": ["0x0023"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 1,
+        "unit": ""
+      },
+      {
+        "titleEN": "Insulation of PV1+ to ground",
+        "titlePL": "Izolacja PV1+ względem ziemi",
+        "registers": ["0x0024"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 1,
+        "unit": ""
+      },
+      {
+        "titleEN": "Insulation of PV2+ to ground",
+        "titlePL": "Izolacja PV2+ względem ziemi",
+        "registers": ["0x0025"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 1,
+        "unit": ""
+      },
+      {
+        "titleEN": "Insulation of PV- to ground",
+        "titlePL": "Izolacja PV- względem ziemi",
+        "registers": ["0x0026"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 1,
+        "unit": ""
+      },
+      {
+        "titleEN": "Country",
+        "titlePL": "Kraj",
+        "registers": ["0x0027"],
+        "parserRule": 1,
+        "optionRanges": [
+          {
+            "key": 0,
+            "valueEN": "Germany",
+            "valuePL": "Niemcy"
+          },
+          {
+            "key": 1,
+            "valueEN": "CEI0-21 Internal",
+            "valuePL": "CEI0-21 Internal"
+          },
+          {
+            "key": 2,
+            "valueEN": "Australia",
+            "valuePL": "Australia"
+          },
+          {
+            "key": 3,
+            "valueEN": "Spain RD1699",
+            "valuePL": "Hiszpania"
+          },
+          {
+            "key": 4,
+            "valueEN": "Turkey",
+            "valuePL": "Turcja"
+          },
+          {
+            "key": 5,
+            "valueEN": "Denmark",
+            "valuePL": "Dania"
+          },
+          {
+            "key": 6,
+            "valueEN": "Greece",
+            "valuePL": "Grecja"
+          },
+          {
+            "key": 7,
+            "valueEN": "Netherland",
+            "valuePL": "Holandia"
+          },
+          {
+            "key": 8,
+            "valueEN": "Belgium",
+            "valuePL": "Belgia"
+          },
+          {
+            "key": 9,
+            "valueEN": "UK-G59",
+            "valuePL": "Anglia-G59"
+          },
+          {
+            "key": 10,
+            "valueEN": "China",
+            "valuePL": "Chiny"
+          },
+          {
+            "key": 11,
+            "valueEN": "France",
+            "valuePL": "Francja"
+          },
+          {
+            "key": 12,
+            "valueEN": "Poland",
+            "valuePL": "Polska"
+          },
+          {
+            "key": 13,
+            "valueEN": "Germany BDEW",
+            "valuePL": "Niemcy BDEW"
+          },
+          {
+            "key": 14,
+            "valueEN": "Germany VDE0126",
+            "valuePL": "Niemcy VDE0126"
+          },
+          {
+            "key": 15,
+            "valueEN": "Italy CEI0-16",
+            "valuePL": "Włochy"
+          },
+          {
+            "key": 16,
+            "valueEN": "UK-G83",
+            "valuePL": "Anglia G83"
+          },
+          {
+            "key": 17,
+            "valueEN": "Greece Islands",
+            "valuePL": "Wyspy Greckie"
+          },
+          {
+            "key": 18,
+            "valueEN": "EU EN50438",
+            "valuePL": "EU EN50438"
+          },
+          {
+            "key": 19,
+            "valueEN": "EU EN61727",
+            "valuePL": "EU EN61727"
+          },
+          {
+            "key": 20,
+            "valueEN": "Korea",
+            "valuePL": "Korea"
+          },
+          {
+            "key": 21,
+            "valueEN": "Sweden",
+            "valuePL": "Szwecja"
+          },
+          {
+            "key": 22,
+            "valueEN": "Europe General",
+            "valuePL": "Europa"
+          },
+          {
+            "key": 23,
+            "valueEN": "CEI0-21 External",
+            "valuePL": "CEI0-21 External"
+          },
+          {
+            "key": 24,
+            "valueEN": "Cyprus",
+            "valuePL": "Cypr"
+          },
+          {
+            "key": 25,
+            "valueEN": "India",
+            "valuePL": "Indie"
+          },
+          {
+            "key": 26,
+            "valueEN": "Philippines",
+            "valuePL": "Filipiny"
+          },
+          {
+            "key": 27,
+            "valueEN": "New Zeland",
+            "valuePL": "Nowa Zelandia"
+          },
+          {
+            "key": 28,
+            "valueEN": "Reserve",
+            "valuePL": "Rezerwacja"
+          },
+          {
+            "key": 29,
+            "valueEN": "Reserve",
+            "valuePL": "Rezerwacja"
+          }
+        ],
+        "ratio": 1,
+        "unit": ""
+      }
+    ]
+  },
+  {
+    "directory": "DCInput",
+    "items": [
+      {
+        "titleEN": "String 1 voltage",
+        "titlePL": "Napięcie string 1",
+        "registers": ["0x0105"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.1,
+        "unit": "V"
+      },
+      {
+        "titleEN": "String 1 current",
+        "titlePL": "Prąd string 1",
+        "registers": ["0x0106"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.01,
+        "unit": "A"
+      },
+      {
+        "titleEN": "String 2 voltage",
+        "titlePL": "Napięcie string 2",
+        "registers": ["0x0107"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.1,
+        "unit": "V"
+      },
+      {
+        "titleEN": "String 2 current",
+        "titlePL": "Prąd string 2",
+        "registers": ["0x0108"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.01,
+        "unit": "A"
+      },
+      {
+        "titleEN": "String 3 voltage",
+        "titlePL": "Napięcie string 3",
+        "registers": ["0x0109"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.1,
+        "unit": "V"
+      },
+      {
+        "titleEN": "String 3 current",
+        "titlePL": "Prąd string 3",
+        "registers": ["0x010A"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.01,
+        "unit": "A"
+      },
+      {
+        "titleEN": "String 4 voltage",
+        "titlePL": "Napięcie string 4",
+        "registers": ["0x010B"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.1,
+        "unit": "V"
+      },
+      {
+        "titleEN": "String 4 current",
+        "titlePL": "Prąd string 4",
+        "registers": ["0x010C"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.01,
+        "unit": "A"
+      },
+      {
+        "titleEN": "String 5 voltage",
+        "titlePL": "Napięcie string 5",
+        "registers": ["0x010D"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.1,
+        "unit": "V"
+      },
+      {
+        "titleEN": "String 5 current",
+        "titlePL": "Prąd string 5",
+        "registers": ["0x010E"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.01,
+        "unit": "A"
+      },
+      {
+        "titleEN": "String 6 voltage",
+        "titlePL": "Napięcie string 6",
+        "registers": ["0x010F"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.1,
+        "unit": "V"
+      },
+      {
+        "titleEN": "String 6 current",
+        "titlePL": "Prąd string 6",
+        "registers": ["0x0110"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.01,
+        "unit": "A"
+      },
+      {
+        "titleEN": "String 7 voltage",
+        "titlePL": "Napięcie string 7",
+        "registers": ["0x0111"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.1,
+        "unit": "V"
+      },
+      {
+        "titleEN": "String 7 current",
+        "titlePL": "Prąd string 7",
+        "registers": ["0x0112"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.01,
+        "unit": "A"
+      },
+      {
+        "titleEN": "String 8 voltage",
+        "titlePL": "Napięcie string 8",
+        "registers": ["0x0113"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.1,
+        "unit": "V"
+      },
+      {
+        "titleEN": "String 8 current",
+        "titlePL": "Prąd string 8",
+        "registers": ["0x0114"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 0.01,
+        "unit": "A"
+      }
+    ]
+  },
+  {
+    "directory": "Alert",
+    "items": [
+      {
+        "titleEN": "Fault 1",
+        "titlePL": "Kod błędu 1",
+        "registers": ["0x0001"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 1,
+        "unit": ""
+      },
+      {
+        "titleEN": "Fault 2",
+        "titlePL": "Kod błędu 2",
+        "registers": ["0x0002"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 1,
+        "unit": ""
+      },
+      {
+        "titleEN": "Fault 3",
+        "titlePL": "Kod błędu 3",
+        "registers": ["0x0003"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 1,
+        "unit": ""
+      },
+      {
+        "titleEN": "Fault 4",
+        "titlePL": "Kod błędu 4",
+        "registers": ["0x0004"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 1,
+        "unit": ""
+      },
+      {
+        "titleEN": "Fault 5",
+        "titlePL": "Kod błędu 5",
+        "registers": ["0x0005"],
+        "parserRule": 1,
+        "optionRanges": [],
+        "ratio": 1,
+        "unit": ""
+      }
+    ]
+  }
+]
