@@ -130,7 +130,7 @@ while chunks<2:
             if lang == "PL":
                 response='"'+option["valuePL"]+'"'
             else:
-                response=option["valueEN"]
+                response='"'+option["valueEN"]+'"'
        if hexpos!='0x0015' and hexpos!='0x0016' and hexpos!='0x0017' and hexpos!='0x0018':
         print(hexpos+" - "+title+": "+str(response)+unit)
         if unit!="":
