@@ -1,7 +1,8 @@
 # SOFAR Inverter
 Small utility to read data from SOFAR K-TLX inverters through the Solarman (WLS-3) datalogger. Tested with logger S/N 17xxxxxxx (protocol V5).
 File SOFARMap.xml contains MODBUS inverter's registers mapping for Sofar Solar K-TLX product line.
-To make it work with other inverter brand/model connected via WLS-3 you need to alter the .xml file accordingly + change pini and pfin values in the InverterData.py to point the variable position start/end.
+
+REMARK: To make it work with other inverter brand/model connected via WLS-3 you need to alter the .xml file accordingly + change pini and pfin values in the InverterData.py to point the variable position start/end.
 
 *Thanks to @jlopez77 https://github.com/jlopez77 for 99% of the code.*
 
