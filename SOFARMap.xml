@@ -9,7 +9,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 10,
-        "unit": "W"
+        "unit": "W",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "SolarPower",
+        "label_name": "Power",
+        "label_value": "PV1"
       },
       {
         "titleEN": "PV2 Power",
@@ -18,7 +23,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 10,
-        "unit": "W"
+        "unit": "W",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "SolarPower",
+        "label_name": "Power",
+        "label_value": "PV2"
       },
       {
         "titleEN": "PV1 Voltage",
@@ -27,7 +37,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.1,
-        "unit": "V"
+        "unit": "V",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "SolarVoltage_volts",
+        "label_name": "Voltage",
+        "label_value": "PV1"
       },
       {
         "titleEN": "PV2 Voltage",
@@ -36,7 +51,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.1,
-        "unit": "V"
+        "unit": "V",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "SolarVoltage_volts",
+        "label_name": "Voltage",
+        "label_value": "PV2"
       },
       {
         "titleEN": "PV1 Current",
@@ -45,7 +65,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.01,
-        "unit": "A"
+        "unit": "A",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "SolarCurrent_ampers",
+        "label_name": "Current",
+        "label_value": "PV1"
       },
       {
         "titleEN": "PV2 Current",
@@ -54,7 +79,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.01,
-        "unit": "A"
+        "unit": "A",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "SolarCurrent_ampers",
+        "label_name": "Current",
+        "label_value": "PV2"
       },
       {
         "titleEN": "Today production",
@@ -63,7 +93,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.01,
-        "unit": "kWh"
+        "unit": "kWh",
+        "export2prometheus": 1,
+        "metric_type": "counter",
+        "metric_name": "SolarProduction_watts_total",
+        "label_name": "Production",
+        "label_value": "Today"
       },
       {
         "titleEN": "Total production",
@@ -72,7 +107,12 @@
         "parserRule": 2,
         "optionRanges": [],
         "ratio": 1,
-        "unit": "kWh"
+        "unit": "kWh",
+        "export2prometheus": 1,
+        "metric_type": "counter",
+        "metric_name": "SolarProduction_watts_total",
+        "label_name": "Production",
+        "label_value": "Total"
       },
       {
         "titleEN": "Total generation time",
@@ -81,7 +121,12 @@
         "parserRule": 2,
         "optionRanges": [],
         "ratio": 1,
-        "unit": "h"
+        "unit": "h",
+        "export2prometheus": 1,
+        "metric_type": "summary",
+        "metric_name": "SolarTime",
+        "label_name": "GenerationTime",
+        "label_value": "Total"
       },
       {
         "titleEN": "Today generation time",
@@ -90,7 +135,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 1,
-        "unit": "min"
+        "unit": "min",
+        "export2prometheus": 1,
+        "metric_type": "summary",
+        "metric_name": "SolarTime",
+        "label_name": "GenerationTime",
+        "label_value": "Today"
       }
     ]
   },
@@ -102,8 +152,13 @@
         "titlePL": "Moc czynna",
         "registers": ["0x000C"],
         "optionRanges": [],
-        "ratio": 0.01,
-        "unit": "kW"
+        "ratio": 10,
+        "unit": "W",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "OutputPower_watts",
+        "label_name": "Power",
+        "label_value": "Active"
       },
       {
         "titleEN": "Output reactive power",
@@ -112,7 +167,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.01,
-        "unit": "kVar"
+        "unit": "kVar",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "OutputPower_watts",
+        "label_name": "Power",
+        "label_value": "Reactive"
       },
       {
         "titleEN": "Grid frequency",
@@ -121,7 +181,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.01,
-        "unit": "Hz"
+        "unit": "Hz",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "OutputFreq",
+        "label_name": "Grid",
+        "label_value": "Frequency"
       },
       {
         "titleEN": "L1 Voltage",
@@ -130,7 +195,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.1,
-        "unit": "V"
+        "unit": "V",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "OutputVoltage_volts",
+        "label_name": "Voltage",
+        "label_value": "L1"
       },
       {
         "titleEN": "L1 Current",
@@ -139,7 +209,12 @@
         "parserRule": 2,
         "optionRanges": [],
         "ratio": 0.01,
-        "unit": "A"
+        "unit": "A",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "OutputCurrent_ampers",
+        "label_name": "Current",
+        "label_value": "L1"
       },
       {
         "titleEN": "L2 Voltage",
@@ -148,7 +223,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.1,
-        "unit": "V"
+        "unit": "V",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "OutputVoltage_volts",
+        "label_name": "Voltage",
+        "label_value": "L2"
       },
       {
         "titleEN": "L2 Current",
@@ -157,7 +237,12 @@
         "parserRule": 2,
         "optionRanges": [],
         "ratio": 0.01,
-        "unit": "A"
+        "unit": "A",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "OutputCurrent_ampers",
+        "label_name": "Current",
+        "label_value": "L2"
       },
       {
         "titleEN": "L3 Voltage",
@@ -166,7 +251,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.1,
-        "unit": "V"
+        "unit": "V",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "OutputVoltage_volts",
+        "label_name": "Voltage",
+        "label_value": "L3"
       },
       {
         "titleEN": "L3 Current",
@@ -175,7 +265,12 @@
         "parserRule": 2,
         "optionRanges": [],
         "ratio": 0.01,
-        "unit": "A"
+        "unit": "A",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "OutputCurrent_ampers",
+        "label_name": "Current",
+        "label_value": "L3"
       }
     ]
   },
@@ -216,7 +311,12 @@
 
         ],
         "ratio": 1,
-        "unit": ""
+        "unit": "",
+        "export2prometheus": 0,
+        "metric_type": "gauge",
+        "metric_name": "Inverter",
+        "label_name": "Status",
+        "label_value": "Status"
       },
       {
         "titleEN": "Inverter module temperature",
@@ -225,7 +325,12 @@
         "parserRule": 2,
         "optionRanges": [],
         "ratio": 1,
-        "unit": "ºC"
+        "unit": "ºC",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "InverterTemp_celsius",
+        "label_name": "Temp",
+        "label_value": "Module"        
       },
       {
         "titleEN": "Inverter inner termperature",
@@ -234,16 +339,26 @@
         "parserRule": 2,
         "optionRanges": [],
         "ratio": 1,
-        "unit": "ºC"
+        "unit": "ºC",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "InverterTemp_celsius",
+        "label_name": "Temp",
+        "label_value": "Inner"
       },
       {
-        "titleEN": "Inverter bus vultage",
+        "titleEN": "Inverter bus voltage",
         "titlePL": "Napięcie szyny falownika",
         "registers": ["0x001D"],
         "parserRule": 2,
         "optionRanges": [],
         "ratio": 0.1,
-        "unit": "V"
+        "unit": "V",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "InverterVoltage_volts",
+        "label_name": "Voltage",
+        "label_value": "Bus"
       },
       {
         "titleEN": "PV1 voltage sample by slave CPU",
@@ -252,7 +367,12 @@
         "parserRule": 2,
         "optionRanges": [],
         "ratio": 0.1,
-        "unit": "V"
+        "unit": "V",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "InverterVoltage_volts",
+        "label_name": "Voltage",
+        "label_value": "PV1VoltageSample"
       },
       {
         "titleEN": "PV1 current sample by slave CPU",
@@ -261,7 +381,12 @@
         "parserRule": 2,
         "optionRanges": [],
         "ratio": 0.1,
-        "unit": "A"
+        "unit": "A",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "InverterCurrent_ampers",
+        "label_name": "Current",
+        "label_value": "PV1CurrentSample"
       }, 
       {
         "titleEN": "Countdown time",
@@ -270,7 +395,12 @@
         "parserRule": 2,
         "optionRanges": [],
         "ratio": 1,
-        "unit": "s"
+        "unit": "s",
+        "export2prometheus": 0,
+        "metric_type": "gauge",
+        "metric_name": "Inverter",
+        "label_name": "Time",
+        "label_value": "Countdown"
       },
       {
         "titleEN": "Inverter alert message",
@@ -279,7 +409,12 @@
         "parserRule": 2,
         "optionRanges": [],
         "ratio": 1,
-        "unit": ""
+        "unit": "",
+        "export2prometheus": 0,
+        "metric_type": "gauge",
+        "metric_name": "Inverter",
+        "label_name": "Alert",
+        "label_value": "Message"
       },
       {
         "titleEN": "Input mode",
@@ -288,7 +423,12 @@
         "parserRule": 2,
         "optionRanges": [],
         "ratio": 1,
-        "unit": ""
+        "unit": "",
+        "export2prometheus": 0,
+        "metric_type": "gauge",
+        "metric_name": "Inverter",
+        "label_name": "InputMode",
+        "label_value": "Mode"
       },
       {
         "titleEN": "Communication Board inner message",
@@ -297,7 +437,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 1,
-        "unit": ""
+        "unit": "",
+        "export2prometheus": 0,
+        "metric_type": "gauge",
+        "metric_name": "Inverter",
+        "label_name": "Communication",
+        "label_value": "BoardInnerMsg"
       },
       {
         "titleEN": "Insulation of PV1+ to ground",
@@ -306,7 +451,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 1,
-        "unit": ""
+        "unit": "",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "InverterInsulation",
+        "label_name": "Insulation2Ground",
+        "label_value": "PV1"
       },
       {
         "titleEN": "Insulation of PV2+ to ground",
@@ -315,7 +465,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 1,
-        "unit": ""
+        "unit": "",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "InverterInsulation",
+        "label_name": "Insulation2Ground",
+        "label_value": "PV2"
       },
       {
         "titleEN": "Insulation of PV- to ground",
@@ -324,7 +479,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 1,
-        "unit": ""
+        "unit": "",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "InverterInsulation",
+        "label_name": "Insulation2Ground",
+        "label_value": "PV"
       },
       {
         "titleEN": "Country",
@@ -484,7 +644,12 @@
           }
         ],
         "ratio": 1,
-        "unit": ""
+        "unit": "",
+        "export2prometheus": 0,
+        "metric_type": "gauge",
+        "metric_name": "Inverter",
+        "label_name": "Country",
+        "label_value": "Code"
       }
     ]
   },
@@ -498,7 +663,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.1,
-        "unit": "V"
+        "unit": "V",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "DCInputVoltage_volts",
+        "label_name": "Voltage",
+        "label_value": "String1"
       },
       {
         "titleEN": "String 1 current",
@@ -507,7 +677,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.01,
-        "unit": "A"
+        "unit": "A",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "DCInputCurrent_ampers",
+        "label_name": "Current",
+        "label_value": "String1"
       },
       {
         "titleEN": "String 2 voltage",
@@ -516,7 +691,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.1,
-        "unit": "V"
+        "unit": "V",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "DCInputVoltage_volts",
+        "label_name": "Voltage",
+        "label_value": "String2"
       },
       {
         "titleEN": "String 2 current",
@@ -525,7 +705,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.01,
-        "unit": "A"
+        "unit": "A",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "DCInputCurrent_ampers",
+        "label_name": "Current",
+        "label_value": "String2"
       },
       {
         "titleEN": "String 3 voltage",
@@ -534,7 +719,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.1,
-        "unit": "V"
+        "unit": "V",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "DCInputVoltage_volts",
+        "label_name": "Voltage",
+        "label_value": "String3"
       },
       {
         "titleEN": "String 3 current",
@@ -543,7 +733,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.01,
-        "unit": "A"
+        "unit": "A",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "DCInputCurrent_ampers",
+        "label_name": "Current",
+        "label_value": "String3"
       },
       {
         "titleEN": "String 4 voltage",
@@ -552,7 +747,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.1,
-        "unit": "V"
+        "unit": "V",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "DCInputVoltage_volts",
+        "label_name": "Voltage",
+        "label_value": "String4"
       },
       {
         "titleEN": "String 4 current",
@@ -561,7 +761,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.01,
-        "unit": "A"
+        "unit": "A",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "DCInputCurrent_ampers",
+        "label_name": "Current",
+        "label_value": "String4"
       },
       {
         "titleEN": "String 5 voltage",
@@ -570,7 +775,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.1,
-        "unit": "V"
+        "unit": "V",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "DCInputVoltage_volts",
+        "label_name": "Voltage",
+        "label_value": "String5"
       },
       {
         "titleEN": "String 5 current",
@@ -579,7 +789,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.01,
-        "unit": "A"
+        "unit": "A",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "DCInputCurrent_ampers",
+        "label_name": "Current",
+        "label_value": "String5"
       },
       {
         "titleEN": "String 6 voltage",
@@ -588,7 +803,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.1,
-        "unit": "V"
+        "unit": "V",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "DCInputVoltage_volts",
+        "label_name": "Voltage",
+        "label_value": "String6"
       },
       {
         "titleEN": "String 6 current",
@@ -597,7 +817,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.01,
-        "unit": "A"
+        "unit": "A",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "DCInputCurrent_ampers",
+        "label_name": "Current",
+        "label_value": "String6"
       },
       {
         "titleEN": "String 7 voltage",
@@ -606,7 +831,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.1,
-        "unit": "V"
+        "unit": "V",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "DCInputVoltage_volts",
+        "label_name": "Voltage",
+        "label_value": "String7"
       },
       {
         "titleEN": "String 7 current",
@@ -615,7 +845,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.01,
-        "unit": "A"
+        "unit": "A",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "DCInputCurrent_ampers",
+        "label_name": "Current",
+        "label_value": "String7"
       },
       {
         "titleEN": "String 8 voltage",
@@ -624,7 +859,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.1,
-        "unit": "V"
+        "unit": "V",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "DCInputVoltage_volts",
+        "label_name": "Voltage",
+        "label_value": "String8"
       },
       {
         "titleEN": "String 8 current",
@@ -633,7 +873,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 0.01,
-        "unit": "A"
+        "unit": "A",
+        "export2prometheus": 1,
+        "metric_type": "gauge",
+        "metric_name": "DCInputCurrent_ampers",
+        "label_name": "Current",
+        "label_value": "String8"
       }
     ]
   },
@@ -647,7 +892,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 1,
-        "unit": ""
+        "unit": "",
+        "export2prometheus": 0,
+        "metric_type": "gauge",
+        "metric_name": "Alert",
+        "label_name": "Fault",
+        "label_value": "Code1"
       },
       {
         "titleEN": "Fault 2",
@@ -656,7 +906,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 1,
-        "unit": ""
+        "unit": "",
+        "export2prometheus": 0,
+        "metric_type": "gauge",
+        "metric_name": "Alert",
+        "label_name": "Fault",
+        "label_value": "Code2"
       },
       {
         "titleEN": "Fault 3",
@@ -665,7 +920,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 1,
-        "unit": ""
+        "unit": "",
+        "export2prometheus": 0,
+        "metric_type": "gauge",
+        "metric_name": "Alert",
+        "label_name": "Fault",
+        "label_value": "Code3"
       },
       {
         "titleEN": "Fault 4",
@@ -674,7 +934,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 1,
-        "unit": ""
+        "unit": "",
+        "export2prometheus": 0,
+        "metric_type": "gauge",
+        "metric_name": "Alert",
+        "label_name": "Fault",
+        "label_value": "Code4"
       },
       {
         "titleEN": "Fault 5",
@@ -683,7 +948,12 @@
         "parserRule": 1,
         "optionRanges": [],
         "ratio": 1,
-        "unit": ""
+        "unit": "",
+        "export2prometheus": 0,
+        "metric_type": "gauge",
+        "metric_name": "Alert",
+        "label_name": "Fault",
+        "label_value": "Code5"
       }
     ]
   }
