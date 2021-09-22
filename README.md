@@ -92,8 +92,7 @@ Eedit i.e. to get different language, other Prometheus metrics names or if Your 
 ```
 
 # Known Issues
-Not sure if four-byte values (Total production and Total generation time) are calculated correctly (when first byte value <>0)
-To be checked ...
+You tell me :)
 
 # Contrib
 Feel free to suggest, rewrite or add whatever you feel is necessary.
