@@ -109,9 +109,9 @@ MQTT support into Home Assistant:
     json_attributes_topic: "mqtt_topic/attributes"
 ```
 # Prometheus support (by Michalux).
-...
+```
 In order to enable Prometheus support:
     1. Configure prometheus options in config.cfg
     2. Serve prometheus metrics file using any web server (name it index.html to be the default page in configured path)
     3. Configure prometheus target to access the file 
-...
+```
