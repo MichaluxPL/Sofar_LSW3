@@ -20,12 +20,14 @@ mqtt_topic=XXXXXXXXXXXX
 mqtt_username=
 mqtt_passwd=
 lang=PL/EN                      # Output language
-prometheus=0                    # set to 1 to export data in Prometheus metrics format
+prometheus=0                    # 1 to export data in Prometheus metrics format
 prometheus_file=/xx/xx/metrics/index.html  # Path to Prometheus metrics file
-verbose=0                       # Set to 1 for additional info to be presented (registers, binary packets)
+verbose=0                       # 1 for additional info to be presented (registers, binary packets)
 
-File SOFARMap.xml contains MODBUS inverter's registers mapping for Sofar Solar K-TLX product line and Prometheus metrics configuration.
-Eedit i.e. to get different language, other Prometheus metrics names or if Your inverter has different register's numbers.
+File SOFARMap.xml contains MODBUS inverter's registers mapping for Sofar Solar K-TLX
+product line and Prometheus metrics configuration.
+Eedit i.e. to get different language, other Prometheus metrics names or
+if Your inverter has different register's numbers.
 ```
 
 # Run
