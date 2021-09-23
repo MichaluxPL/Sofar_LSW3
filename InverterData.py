@@ -193,3 +193,4 @@ if mqtt==1:
 else:
  jsonoutput=json.loads(output)
  print(json.dumps(jsonoutput, indent=4, sort_keys=False, ensure_ascii=False))
+

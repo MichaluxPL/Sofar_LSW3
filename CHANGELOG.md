@@ -32,3 +32,4 @@ Enjoy :)
  
 ### Fixed
 1. 4-byte values (Total production, Total generation time) calculated correctly.
+
