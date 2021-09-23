@@ -109,7 +109,7 @@ MQTT support into Home Assistant:
     json_attributes_topic: "mqtt_topic/attributes"
 ```
 # Prometheus+Grafana support (by Michalux).
-...
+```
 In order to enable Prometheus+Grafana support:
     1. Configure prometheus options in config.cfg
     2. Serve prometheus metrics file using any web server (name it index.html to be the default page in configured path)
@@ -117,4 +117,4 @@ In order to enable Prometheus+Grafana support:
     4. Add Prometheus datasource in Grafana
     5. Import grafana_en/pl.json file (Dashboards->Manage->Import).
     Enjoy :)
-...
+```
