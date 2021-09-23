@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # Script gathering solar data from Sofar Solar Inverter (K-TLX) via WiFi module LSW-3
-# 
+# by Michalux (original DEYE script by jlopez77)
 
 import sys
 import socket
@@ -11,6 +11,7 @@ import json
 import paho.mqtt.client as paho
 import os
 import configparser
+import time
 
 def twosComplement_hex(hexval):
     bits = 16
@@ -18,6 +19,11 @@ def twosComplement_hex(hexval):
     if val & (1 << (bits-1)):
         val -= 1 << bits
     return val
+
+# Write metrics for Prometheus
+def PMetrics(mfile, mname, mtype, mlabel, mlvalue, data):
+    line="# TYPE "+mname+" "+mtype+"\n"+mname+"{"+mlabel+"=\""+mlvalue+"\"} "+str(data)+"\n"
+    mfile.write(line)
 
 os.chdir(os.path.dirname(sys.argv[0]))
 #os.chdir("/home/pi/solarman/SofarInverter")
@@ -37,7 +43,14 @@ mqtt_topic=configParser.get('SofarInverter', 'mqtt_topic')
 mqtt_username=configParser.get('SofarInverter', 'mqtt_username')
 mqtt_passwd=configParser.get('SofarInverter', 'mqtt_passwd')
 lang=configParser.get('SofarInverter', 'lang')
+verbose=configParser.get('SofarInverter', 'verbose')
+prometheus=configParser.get('SofarInverter', 'prometheus')
+prometheus_file=configParser.get('SofarInverter', 'prometheus_file')
 # END CONFIG
+
+timestamp=str(time.time()).split(".")[0]
+
+if prometheus=="1": prometheus_file = open(prometheus_file, "w");
 
 # PREPARE & SEND DATA TO THE INVERTER
 output="{" # initialise json output
@@ -45,11 +58,9 @@ pini=0
 pfin=39
 chunks=0
 while chunks<2:
- #print("Chunks: ", chunks)
- if chunks==-1: # testing initialisation
-  pini=235
-  pfin=235
-  print("Initialise Connection")
+ if verbose=="1": print("Chunk no: ", chunks);
+
+# Data frame begin
  start = binascii.unhexlify('A5') #start
  length=binascii.unhexlify('1700') # datalength
  controlcode= binascii.unhexlify('1045') #controlCode
@@ -61,32 +72,33 @@ while chunks<2:
  crc=binascii.unhexlify(str(hex(libscrc.modbus(businessfield))[4:6])+str(hex(libscrc.modbus(businessfield))[2:4])) # CRC16modbus
  checksum=binascii.unhexlify('00') #checksum F2
  endCode = binascii.unhexlify('15')
- 
+
  inverter_sn2 = bytearray.fromhex(hex(inverter_sn)[8:10] + hex(inverter_sn)[6:8] + hex(inverter_sn)[4:6] + hex(inverter_sn)[2:4])
  frame = bytearray(start + length + controlcode + serial + inverter_sn2 + datafield + businessfield + crc + checksum + endCode)
- #print("Sent: ", frame)
- 
+ if verbose=="1": print("Sent data: ", frame);
+ # Data frame end
+
  checksum = 0
  frame_bytes = bytearray(frame)
  for i in range(1, len(frame_bytes) - 2, 1):
      checksum += frame_bytes[i] & 255
  frame_bytes[len(frame_bytes) - 2] = int((checksum & 255))
- 
+
  # OPEN SOCKET
- for res in socket.getaddrinfo(inverter_ip, inverter_port, socket.AF_INET,
-                                            socket.SOCK_STREAM):
+ for res in socket.getaddrinfo(inverter_ip, inverter_port, socket.AF_INET, socket.SOCK_STREAM):
                   family, socktype, proto, canonname, sockadress = res
                   try:
                    clientSocket= socket.socket(family,socktype,proto);
                    clientSocket.settimeout(10);
                    clientSocket.connect(sockadress);
                   except socket.error as msg:
-                   print("Could not open socket");
-                   break
- 
+                   print("Could not open socket - inverter/logger turned off");
+                   if prometheus=="1": prometheus_file.close();
+                   sys.exit(1)
+
  # SEND DATA
  clientSocket.sendall(frame_bytes);
- 
+
  ok=False;
  while (not ok):
   try:
@@ -102,7 +114,7 @@ while chunks<2:
    sys.exit(1) #Exit
 
 # PARSE RESPONSE (start position 56, end position 60)
- #print("Received: ", data)
+ if verbose=="1": print("Received data: ", data);
  totalpower=0
  totaltime=0
  i=pfin-pini
@@ -122,6 +134,11 @@ while chunks<2:
         title=item["titleEN"]
      ratio=item["ratio"]
      unit=item["unit"]
+     export2prometheus=item["export2prometheus"]
+     metric_name=item["metric_name"]
+     label_name=item["label_name"]
+     label_value=item["label_value"]
+     metric_type=item["metric_type"]
      for register in item["registers"]:
       if register==hexpos and chunks!=-1:
        response=round(response*ratio,2)
@@ -132,28 +149,35 @@ while chunks<2:
             else:
                 response='"'+option["valueEN"]+'"'
        if hexpos!='0x0015' and hexpos!='0x0016' and hexpos!='0x0017' and hexpos!='0x0018':
-        print(hexpos+" - "+title+": "+str(response)+unit)
+        if verbose=="1": print(hexpos+" - "+title+": "+str(response)+unit);
+        if prometheus=="1" and export2prometheus==1:
+         PMetrics(prometheus_file, metric_name, metric_type, label_name, label_value, response)
         if unit!="":
             output=output+"\""+ title + " (" + unit + ")" + "\":" + str(response)+","
         else:
             output=output+"\""+ title + "\":" + str(response)+","
-       if hexpos=='0x0015': totalpower+=response*ratio;
+       if hexpos=='0x0015': totalpower+=response*ratio*65535;
        if hexpos=='0x0016':
         totalpower+=response*ratio
-        print(hexpos+" - "+title+": "+str(response*ratio)+unit)
+        if verbose=="1": print(hexpos+" - "+title+": "+str(response*ratio)+unit);
         output=output+"\""+ title + " (" + unit + ")" + "\":" + str(totalpower)+","
-       if hexpos=='0x0017': totaltime+=response*ratio;
+        if prometheus=="1" and export2prometheus==1:
+         PMetrics(prometheus_file, metric_name, metric_type, label_name, label_value, (totalpower*1000))
+       if hexpos=='0x0017': totaltime+=response*ratio*65535;
        if hexpos=='0x0018':
         totaltime+=response*ratio
-        print(hexpos+" - "+title+": "+str(response*ratio)+unit)
+        if verbose=="1": print(hexpos+" - "+title+": "+str(response*ratio)+unit);
         output=output+"\""+ title + " (" + unit + ")" + "\":" + str(totaltime)+","
-
+        if prometheus=="1" and export2prometheus==1:
+         PMetrics(prometheus_file, metric_name, metric_type, label_name, label_value, totaltime)
   a+=1
  if chunks==0:
   pini=261
   pfin=276
  chunks+=1
 output=output[:-1]+"}"
+
+if prometheus=="1": prometheus_file.close();
 
 # MQTT integration
 if mqtt==1:
@@ -169,4 +193,3 @@ if mqtt==1:
 else:
  jsonoutput=json.loads(output)
  print(json.dumps(jsonoutput, indent=4, sort_keys=False, ensure_ascii=False))
- #print(output)
