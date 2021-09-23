@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # Script gathering solar data from Sofar Solar Inverter (K-TLX) via WiFi module LSW-3
-# by Michalux & jlopez77
+# by Michalux (original DEYE script by jlopez77)
 
 import sys
 import socket
@@ -58,11 +58,9 @@ pini=0
 pfin=39
 chunks=0
 while chunks<2:
- #print("Chunks: ", chunks)
- if chunks==-1: # testing initialisation
-  pini=235
-  pfin=235
-  print("Initialise Connection")
+ if verbose=="1": print("Chunk no: ", chunks);
+
+# Data frame begin
  start = binascii.unhexlify('A5') #start
  length=binascii.unhexlify('1700') # datalength
  controlcode= binascii.unhexlify('1045') #controlCode
@@ -78,6 +76,7 @@ while chunks<2:
  inverter_sn2 = bytearray.fromhex(hex(inverter_sn)[8:10] + hex(inverter_sn)[6:8] + hex(inverter_sn)[4:6] + hex(inverter_sn)[2:4])
  frame = bytearray(start + length + controlcode + serial + inverter_sn2 + datafield + businessfield + crc + checksum + endCode)
  if verbose=="1": print("Sent data: ", frame);
+ # Data frame end
 
  checksum = 0
  frame_bytes = bytearray(frame)
@@ -95,8 +94,7 @@ while chunks<2:
                   except socket.error as msg:
                    print("Could not open socket - inverter/logger turned off");
                    if prometheus=="1": prometheus_file.close();
-                   quit()
-                   #break
+                   sys.exit(1)
 
  # SEND DATA
  clientSocket.sendall(frame_bytes);
@@ -149,11 +147,10 @@ while chunks<2:
             if lang == "PL":
                 response='"'+option["valuePL"]+'"'
             else:
-                response=option["valueEN"]
+                response='"'+option["valueEN"]+'"'
        if hexpos!='0x0015' and hexpos!='0x0016' and hexpos!='0x0017' and hexpos!='0x0018':
         if verbose=="1": print(hexpos+" - "+title+": "+str(response)+unit);
         if prometheus=="1" and export2prometheus==1:
-         if unit=="kWh": response=response*1000;
          PMetrics(prometheus_file, metric_name, metric_type, label_name, label_value, response)
         if unit!="":
             output=output+"\""+ title + " (" + unit + ")" + "\":" + str(response)+","
