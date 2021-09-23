@@ -156,14 +156,14 @@ while chunks<2:
             output=output+"\""+ title + " (" + unit + ")" + "\":" + str(response)+","
         else:
             output=output+"\""+ title + "\":" + str(response)+","
-       if hexpos=='0x0015': totalpower+=response*ratio*65535;
+       if hexpos=='0x0015': totalpower+=response*ratio*65536;
        if hexpos=='0x0016':
         totalpower+=response*ratio
         if verbose=="1": print(hexpos+" - "+title+": "+str(response*ratio)+unit);
         output=output+"\""+ title + " (" + unit + ")" + "\":" + str(totalpower)+","
         if prometheus=="1" and export2prometheus==1:
          PMetrics(prometheus_file, metric_name, metric_type, label_name, label_value, (totalpower*1000))
-       if hexpos=='0x0017': totaltime+=response*ratio*65535;
+       if hexpos=='0x0017': totaltime+=response*ratio*65536;
        if hexpos=='0x0018':
         totaltime+=response*ratio
         if verbose=="1": print(hexpos+" - "+title+": "+str(response*ratio)+unit);
