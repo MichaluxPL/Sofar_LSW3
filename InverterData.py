@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # Script gathering solar data from Sofar Solar Inverter (K-TLX) via WiFi module LSW-3
-# by Michalux (original DEYE script by jlopez77)
+# by Michalux (based on DEYE script by jlopez77)
 
 import sys
 import socket
@@ -11,7 +11,9 @@ import json
 import paho.mqtt.client as paho
 import os
 import configparser
-import time
+import datetime
+from influxdb import InfluxDBClient
+from datetime import datetime
 
 def twosComplement_hex(hexval):
     bits = 16
@@ -21,9 +23,17 @@ def twosComplement_hex(hexval):
     return val
 
 # Write metrics for Prometheus
-def PMetrics(mfile, mname, mtype, mlabel, mlvalue, data):
-    line="# TYPE "+mname+" "+mtype+"\n"+mname+"{"+mlabel+"=\""+mlvalue+"\"} "+str(data)+"\n"
+def PMetrics(mfile, mname, mtype, mlabel, mlvalue, pdata):
+    line="# TYPE "+mname+" "+mtype+"\n"+mname+"{"+mlabel+"=\""+mlvalue+"\"} "+str(pdata)+"\n"
     mfile.write(line)
+
+# InfluxDB support
+def PrepareInfluxData(IfData, fieldname, fieldvalue):
+    IfData[0]["fields"][fieldname]=float(fieldvalue)
+    return IfData
+
+def Write2InfluxDB(IfData):
+    ifclient.write_points(IfData);
 
 os.chdir(os.path.dirname(sys.argv[0]))
 #os.chdir("/home/pi/solarman/SofarInverter")
@@ -46,17 +56,37 @@ lang=configParser.get('SofarInverter', 'lang')
 verbose=configParser.get('SofarInverter', 'verbose')
 prometheus=configParser.get('SofarInverter', 'prometheus')
 prometheus_file=configParser.get('SofarInverter', 'prometheus_file')
+influxdb=configParser.get('SofarInverter', 'influxdb')
+ifhost=configParser.get('SofarInverter', 'influxdb_host')
+ifport=configParser.get('SofarInverter', 'influxdb_port')
+ifuser=configParser.get('SofarInverter', 'influxdb_user')
+ifpass=configParser.get('SofarInverter', 'influxdb_password')
+ifdb=configParser.get('SofarInverter', 'influxdb_dbname')
 # END CONFIG
 
-timestamp=str(time.time()).split(".")[0]
+timestamp=str(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
 
+# Initialise Prometheus support
 if prometheus=="1": prometheus_file = open(prometheus_file, "w");
+
+# Initialise InfluxDB support
+if influxdb=="1":
+    ifclient = InfluxDBClient(ifhost,ifport,ifuser,ifpass,ifdb);
+    InfluxData=[
+        {
+            "measurement": "InverterData",
+            "time": timestamp,
+            "fields": {}
+        }
+    ]
 
 # PREPARE & SEND DATA TO THE INVERTER
 output="{" # initialise json output
 pini=0
 pfin=39
 chunks=0
+totalpower=0
+totaltime=0
 while chunks<2:
  if verbose=="1": print("Chunk no: ", chunks);
 
@@ -115,8 +145,6 @@ while chunks<2:
 
 # PARSE RESPONSE (start position 56, end position 60)
  if verbose=="1": print("Received data: ", data);
- totalpower=0
- totaltime=0
  i=pfin-pini
  a=0
  while a<=i:
@@ -134,7 +162,7 @@ while chunks<2:
         title=item["titleEN"]
      ratio=item["ratio"]
      unit=item["unit"]
-     export2prometheus=item["export2prometheus"]
+     graph=item["graph"]
      metric_name=item["metric_name"]
      label_name=item["label_name"]
      label_value=item["label_value"]
@@ -150,8 +178,9 @@ while chunks<2:
                 response='"'+option["valueEN"]+'"'
        if hexpos!='0x0015' and hexpos!='0x0016' and hexpos!='0x0017' and hexpos!='0x0018':
         if verbose=="1": print(hexpos+" - "+title+": "+str(response)+unit);
-        if prometheus=="1" and export2prometheus==1:
+        if prometheus=="1" and graph==1:
          PMetrics(prometheus_file, metric_name, metric_type, label_name, label_value, response)
+        if influxdb=="1" and graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, response);
         if unit!="":
             output=output+"\""+ title + " (" + unit + ")" + "\":" + str(response)+","
         else:
@@ -161,15 +190,17 @@ while chunks<2:
         totalpower+=response*ratio
         if verbose=="1": print(hexpos+" - "+title+": "+str(response*ratio)+unit);
         output=output+"\""+ title + " (" + unit + ")" + "\":" + str(totalpower)+","
-        if prometheus=="1" and export2prometheus==1:
+        if prometheus=="1" and graph==1:
          PMetrics(prometheus_file, metric_name, metric_type, label_name, label_value, (totalpower*1000))
+        if influxdb=="1" and graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, totalpower);
        if hexpos=='0x0017': totaltime+=response*ratio*65536;
        if hexpos=='0x0018':
         totaltime+=response*ratio
         if verbose=="1": print(hexpos+" - "+title+": "+str(response*ratio)+unit);
         output=output+"\""+ title + " (" + unit + ")" + "\":" + str(totaltime)+","
-        if prometheus=="1" and export2prometheus==1:
+        if prometheus=="1" and graph==1:
          PMetrics(prometheus_file, metric_name, metric_type, label_name, label_value, totaltime)
+        if influxdb=="1" and graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, totaltime);
   a+=1
  if chunks==0:
   pini=261
@@ -178,6 +209,9 @@ while chunks<2:
 output=output[:-1]+"}"
 
 if prometheus=="1": prometheus_file.close();
+if influxdb=="1":
+    if verbose=="1": print("Influx data: ",InfluxData);
+    Write2InfluxDB(InfluxData)
 
 # MQTT integration
 if mqtt==1:
@@ -187,10 +221,9 @@ if mqtt==1:
   client.tls_set()  # <--- even without arguments
   client.username_pw_set(username=mqtt_username, password=mqtt_passwd)
  client.connect(mqtt_server, mqtt_port)
- client.publish(mqtt_topic,totalpower)
  client.publish(mqtt_topic+"/attributes",output)
+ client.publish(mqtt_topic,totalpower)
  print("Data has been sent to MQTT")
 else:
  jsonoutput=json.loads(output)
  print(json.dumps(jsonoutput, indent=4, sort_keys=False, ensure_ascii=False))
-

@@ -22,6 +22,12 @@ mqtt_passwd=
 lang=                           # Output language (available: PL,EN)
 prometheus=0                    # set to 1 to export data in Prometheus metrics format
 prometheus_file=/xx/xx/metrics/index.html  # Path to Prometheus metrics file served by web server
+influxdb=0                      # set to 1 to export data to InfluxDB
+influxdb_host=                  # InfluxDB host (i.e. 127.0.0.1)
+influxdb_port=8086              # InfluxDB port
+influxdb_user=                  # InfluxDB user with permisions to read/write from/to dbname
+influxdb_password=              # User password
+influxdb_dbname=                # Database name 
 verbose=0                       # Set to 1 for additional info to be presented (registers, binary packets etc.)
 
 File SOFARMap.xml contains MODBUS inverter's registers mapping for Sofar Solar K-TLX product line and Prometheus metrics configuration.
@@ -100,7 +106,6 @@ Feel free to suggest, rewrite or add whatever you feel is necessary.
 
 # Home Assistant support (by jlopez77)
 MQTT support into Home Assistant:
-
 ```
   - platform: mqtt
     name: "SofarInverter"
@@ -108,7 +113,7 @@ MQTT support into Home Assistant:
     unit_of_measurement: "W"
     json_attributes_topic: "mqtt_topic/attributes"
 ```
-# Prometheus+Grafana support (by Michalux).
+# Prometheus+Grafana support
 ```
 In order to enable Prometheus+Grafana support:
     1. Configure prometheus options in config.cfg
@@ -118,4 +123,12 @@ In order to enable Prometheus+Grafana support:
     5. Import grafana_en/pl.json file (Dashboards->Manage->Import).
     Enjoy :)
 ```
-
+# InfluxDB+Grafana support
+```
+In order to enable InfluxDB+Grafana support:
+    1. Configure InfluxDB options in config.cfg
+    2. Create database to store inverter data in InfluxDB (i.e. create database Data)
+    3. Add InfluxDB datasource in Grafana (name it InfluxDB)
+    4. Import grafana_iflux_en/pl.json file (Dashboards->Manage->Import).
+    Enjoy :)
+```
