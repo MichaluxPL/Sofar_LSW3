@@ -32,6 +32,23 @@ verbose=0                       # Set to 1 for additional info to be presented (
 
 File SOFARMap.xml contains MODBUS inverter's registers mapping for Sofar Solar K-TLX product line and Prometheus metrics configuration.
 Edit i.e. to get different language, other Prometheus metrics names or if Your inverter has different register's numbers.
+SOFARMap.xml structure and fields definition:
+"directory": "solar",               # Id
+    "items": [
+      {
+        "titleEN": "PV1 Power",     # English JSON output name 
+        "titlePL": "Moc PV1",       # Polish JSON output name
+        "registers": ["0x000A"],    # Inverter's register address
+        "parserRule": 1,            # Currently unused
+        "optionRanges": [],         # For numeric value to text label mappings
+        "ratio": 10,                # Value ratio
+        "unit": "W",                # Value unit
+        "graph": 1,                 # Set to 1, to export value to Prometheus/InfluxDB
+        "metric_type": "gauge",     # Prometheus metric type
+        "metric_name": "SolarPower",# Prometheus/InfluxDB name
+        "label_name": "Power",      # Prometheus/InfluxDB label name
+        "label_value": "PV1"        # Prometheus/InfluxDB value name
+      }
 ```
 
 # Run
@@ -128,7 +145,7 @@ In order to enable Prometheus+Grafana support:
 In order to enable InfluxDB+Grafana support:
     1. Configure InfluxDB options in config.cfg
     2. Create database to store inverter data in InfluxDB (i.e. create database Data)
-    3. Add InfluxDB datasource in Grafana (name it InfluxDB)
-    4. Import grafana_ifdb_en/pl.json file (Dashboards->Manage->Import).
+    3. Add InfluxDB datasource in Grafana
+    4. Import grafana_iflux_en/pl.json file (Dashboards->Manage->Import).
     Enjoy :)
 ```
