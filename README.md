@@ -35,7 +35,7 @@ verbose=0                       # Set to 1 for additional info to be presented (
 
 File SOFARMap.xml contains MODBUS inverter's registers mapping for Sofar Solar K-TLX product line
 and Prometheus metrics configuration.
-Edit i.e. to get different language, other Prometheus metrics names or
+Edit i.e. to get different language, other Prometheus/InfluxDB metrics names or
 if Your inverter has different register's numbers.
 SOFARMap.xml structure and fields definition:
 "directory": "solar",               # Id
@@ -135,7 +135,7 @@ MQTT support into Home Assistant:
 ```
 # Prometheus+Grafana support
 ```
-In order to enable Prometheus+Grafana support:
+Steps to run Prometheus+Grafana support:
     1. Configure prometheus options in config.cfg
     2. Serve prometheus metrics file using any web server (name it index.html to be the default page in configured path)
     3. Configure prometheus target to access the file 
@@ -145,10 +145,10 @@ In order to enable Prometheus+Grafana support:
 ```
 # InfluxDB+Grafana support
 ```
-In order to enable InfluxDB+Grafana support:
+Steps to run InfluxDB+Grafana support:
     1. Configure InfluxDB options in config.cfg
     2. Create database to store inverter data in InfluxDB (i.e. create database Data)
-    3. Add InfluxDB datasource in Grafana
+    3. Add InfluxDB datasource in Grafana (name it InfluxDB)
     4. Import grafana_iflux_en/pl.json file (Dashboards->Manage->Import).
     Enjoy :)
 ```
