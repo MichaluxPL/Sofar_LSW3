@@ -1,9 +1,9 @@
 # SOFAR Inverter + LSW-3
-Small utility to read data from SOFAR K-TLX inverters through the Solarman (WLS-3) datalogger. 
+Small utility to read data from SOFAR K-TLX inverters through the Solarman (LSW-3) datalogger. 
 Tested with logger S/N 17xxxxxxx and 21xxxxxxx (protocol V5).
 Requires python3 to run.
 
-REMARK: To make it work with other inverter brand/model connected via WLS-3 you need to alter the .xml file accordingly
+REMARK: To make it work with other inverter brand/model connected via LSW-3 you need to alter the .xml file accordingly
 and change pini and pfin values in the InverterData.py to point the register's position start/end.
 
 *Thanks to @jlopez77 https://github.com/jlopez77 for a big part of the code.*
