@@ -1,5 +1,7 @@
+PABLOLITE
+
 # SOFAR Inverter + LSW-3
-Small utility to read data from SOFAR K-TLX inverters through the Solarman (LSW-3) datalogger. 
+Small utility to read data from SOFAR K-TLX inverters through the Solarman (LSW-3) datalogger.
 Tested with logger S/N 17xxxxxxx and 21xxxxxxx (protocol V5).
 Requires python3 to run.
 
@@ -30,7 +32,7 @@ influxdb_host=                  # InfluxDB host (i.e. 127.0.0.1)
 influxdb_port=8086              # InfluxDB port
 influxdb_user=                  # InfluxDB user with permisions to read/write from/to dbname
 influxdb_password=              # User password
-influxdb_dbname=                # Database name 
+influxdb_dbname=                # Database name
 verbose=0                       # Set to 1 for additional info to be presented (registers, binary packets etc.)
 
 File SOFARMap.xml contains MODBUS inverter's registers mapping for Sofar Solar K-TLX product line
@@ -41,7 +43,7 @@ SOFARMap.xml structure and fields definition:
 "directory": "solar",               # Id
     "items": [
       {
-        "titleEN": "PV1 Power",     # English JSON output name 
+        "titleEN": "PV1 Power",     # English JSON output name
         "titlePL": "Moc PV1",       # Polish JSON output name
         "registers": ["0x000A"],    # Inverter's register address
         "parserRule": 1,            # Currently unused
@@ -138,7 +140,7 @@ MQTT support into Home Assistant:
 Steps to run Prometheus+Grafana support:
     1. Configure prometheus options in config.cfg
     2. Serve prometheus metrics file using any web server (name it index.html to be the default page in configured path)
-    3. Configure prometheus target to access the file 
+    3. Configure prometheus target to access the file
     4. Add Prometheus datasource in Grafana
     5. Import grafana_en/pl.json file (Dashboards->Manage->Import).
     Enjoy :)
