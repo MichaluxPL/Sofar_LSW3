@@ -47,6 +47,7 @@ inverter_ip=configParser.get('SofarInverter', 'inverter_ip')
 inverter_port=int(configParser.get('SofarInverter', 'inverter_port'))
 inverter_sn=int(configParser.get('SofarInverter', 'inverter_sn'))
 mqtt=int(configParser.get('SofarInverter', 'mqtt'))
+mqtt_ha_discovery=int(configParser.get('SofarInverter', 'mqtt_ha_discovery'))
 mqtt_server=configParser.get('SofarInverter', 'mqtt_server')
 mqtt_port=int(configParser.get('SofarInverter', 'mqtt_port'))
 mqtt_topic=configParser.get('SofarInverter', 'mqtt_topic')
@@ -80,7 +81,11 @@ if influxdb=="1":
         }
     ]
 
+# Initialise mqtt_ha_discovery support
+if mqtt_ha_discovery=="1":
+ odczyty = []
 # PREPARE & SEND DATA TO THE INVERTER
+
 output="{" # initialise json output
 pini=0
 pfin=39
@@ -180,6 +185,9 @@ while chunks<2:
         if verbose=="1": print(hexpos+" - "+title+": "+str(response)+unit);
         if prometheus=="1" and graph==1:
          PMetrics(prometheus_file, metric_name, metric_type, label_name, label_value, response)
+        if mqtt_ha_discovery=="1":
+         #wyniki do tablicy w celu integracji MQTT z HomeAssistant
+         odczyty.append([title, ratio, unit, metric_type, metric_name, label_name, label_value, response,register])
         if influxdb=="1" and graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, response);
         if unit!="":
             output=output+"\""+ title + " (" + unit + ")" + "\":" + str(response)+","
@@ -192,6 +200,9 @@ while chunks<2:
         output=output+"\""+ title + " (" + unit + ")" + "\":" + str(totalpower)+","
         if prometheus=="1" and graph==1:
          PMetrics(prometheus_file, metric_name, metric_type, label_name, label_value, (totalpower*1000))
+        if mqtt_ha_discovery=="1":
+         #wyniki do tablicy w celu integracji MQTT z HomeAssistant
+         odczyty.append([title, ratio, unit, metric_type, metric_name, label_name, label_value, response,(totalpower*1000)])
         if influxdb=="1" and graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, totalpower);
        if hexpos=='0x0017': totaltime+=response*ratio*65536;
        if hexpos=='0x0018':
@@ -200,6 +211,9 @@ while chunks<2:
         output=output+"\""+ title + " (" + unit + ")" + "\":" + str(totaltime)+","
         if prometheus=="1" and graph==1:
          PMetrics(prometheus_file, metric_name, metric_type, label_name, label_value, totaltime)
+        if mqtt_ha_discovery=="1":
+         #wyniki do tablicy w celu integracji MQTT z HomeAssistant
+         odczyty.append([title, ratio, unit, metric_type, metric_name, label_name, label_value, response,totaltime])
         if influxdb=="1" and graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, totaltime);
   a+=1
  if chunks==0:
@@ -218,12 +232,32 @@ if mqtt==1:
  # Initialise MQTT if configured
  client=paho.Client("inverter")
  if mqtt_username!="":
-  client.tls_set()  # <--- even without arguments
+ # client.tls_set()  # <--- even without arguments
   client.username_pw_set(username=mqtt_username, password=mqtt_passwd)
  client.connect(mqtt_server, mqtt_port)
  client.publish(mqtt_topic+"/attributes",output)
  client.publish(mqtt_topic,totalpower)
  print("Data has been sent to MQTT")
+ if mqtt_ha_discovery=="1":
+     # wysylanie danych do MQTT z automatycznym wykrywaniem sensorow w HomeAssistant
+      licznik=0
+      client.connect(mqtt_server, mqtt_port)
+      client.loop_start()
+      client.publish("sofar/sofar_logger/"+str(inverter_sn)+"/enabled","true")
+      client.publish("sofar/sofar_logger/"+str(inverter_sn)+"/state/connected","true")
+      for odczyt in odczyty:
+     # sensor "energy" dla jednostek produkcji pradu
+        if odczyt[2]=="kWh" or odczyt[2]=="Wh" or odczyt[2]=="W":
+         client.publish("homeassistant/sensor/sofar_logger/"+str(inverter_sn)+"_"+str(licznik)+"/config","{\"avty\":{\"topic\":\"sofar/sofar_logger/"+str(inverter_sn)+"/state/connected\",\"payload_available\":\"true\",\"payload_not_available\":\"false\"},\"~\":\"sofar/sofar_logger/"+str(inverter_sn)+"/\",\"device\":{\"ids\":\""+str(inverter_sn)+"\",\"mf\":\"Sofar\",\"name\":\"WLS-3\",\"sw\":\"x.x.x\"},\"name\":\""+(odczyt[0])+" ["+(odczyt[2])+"]\",\"uniq_id\":\""+str(inverter_sn)+"_"+str(licznik)+"\",\"qos\":0,\"unit_of_meas\":\""+(odczyt[2])+"\",\"stat_t\":\"~state/"+(odczyt[4])+(odczyt[6])+"\",\"val_tpl\":\"{{ value | round(5) }}\",\"dev_cla\":\"energy\",\"state_class\":\"total_increasing\"}")
+         client.publish("sofar/sofar_logger/"+str(inverter_sn)+"/state/"+(odczyt[4])+(odczyt[6]),(odczyt[7]))
+         print ("["+str(licznik)+"]"+odczyt[0])
+         licznik=licznik+1
+     # reszta sensorow - mozna jeszcze jakies oddzielic
+        else:
+         client.publish("homeassistant/sensor/sofar_logger/"+str(inverter_sn)+"_"+str(licznik)+"/config","{\"avty\":{\"topic\":\"sofar/sofar_logger/"+str(inverter_sn)+"/state/connected\",\"payload_available\":\"true\",\"payload_not_available\":\"false\"},\"~\":\"sofar/sofar_logger/"+str(inverter_sn)+"/\",\"device\":{\"ids\":\""+str(inverter_sn)+"\",\"mf\":\"Sofar\",\"name\":\"WLS-3\",\"sw\":\"x.x.x\"},\"name\":\""+(odczyt[0])+" ["+(odczyt[2])+"]\",\"uniq_id\":\""+str(inverter_sn)+"_"+str(licznik)+"\",\"qos\":0,\"unit_of_meas\":\""+(odczyt[2])+"\",\"stat_t\":\"~state/"+(odczyt[4])+(odczyt[6])+"\",\"val_tpl\":\"{{ value | round(5) }}\",\"dev_cla\":\"current\",\"state_class\":\"measurement\"}")
+         client.publish("sofar/sofar_logger/"+str(inverter_sn)+"/state/"+(odczyt[4])+(odczyt[6]),(odczyt[7]))
+         print ("["+str(licznik)+"]"+odczyt[0])
+         licznik=licznik+1
 else:
  jsonoutput=json.loads(output)
  print(json.dumps(jsonoutput, indent=4, sort_keys=False, ensure_ascii=False))
