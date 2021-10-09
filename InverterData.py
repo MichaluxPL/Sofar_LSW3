@@ -12,8 +12,11 @@ import paho.mqtt.client as paho
 import os
 import configparser
 import datetime
+import csv
+import ast
 from influxdb import InfluxDBClient
 from datetime import datetime
+
 
 def twosComplement_hex(hexval):
     bits = 16
@@ -81,7 +84,7 @@ if influxdb=="1":
     ]
 
 # PREPARE & SEND DATA TO THE INVERTER
-output="{" # initialise json output
+output="{" # initialise json output      
 pini=0
 pfin=39
 chunks=0
@@ -152,7 +155,7 @@ while chunks<2:
   p2=60+(a*4)
   response=twosComplement_hex(str(''.join(hex(ord(chr(x)))[2:].zfill(2) for x in bytearray(data))+'  '+re.sub('[^\x20-\x7f]', '', ''))[p1:p2])
   hexpos=str("0x") + str(hex(a+pini)[2:].zfill(4)).upper()
-  with open("./SOFARMap.xml") as txtfile:
+  with open("./SOFARMap.xml", encoding="utf8") as txtfile:
    parameters=json.loads(txtfile.read())
   for parameter in parameters:
    for item in parameter["items"]:
@@ -225,5 +228,22 @@ if mqtt==1:
  client.publish(mqtt_topic,totalpower)
  print("Data has been sent to MQTT")
 else:
- jsonoutput=json.loads(output)
- print(json.dumps(jsonoutput, indent=4, sort_keys=False, ensure_ascii=False))
+ #jsonoutput=json.loads(output)
+ #print(json.dumps(jsonoutput, indent=4, sort_keys=False, ensure_ascii=False))
+ dictoutput = ast.literal_eval(output)
+ timestamp ={"timestamp": datetime.now().strftime("%Y-%m-%d %H:%M")}
+ timestamp.update(dictoutput)
+ csvfilename="test.csv"
+ if (not os.path.exists(csvfilename)):
+    with open("test.csv",'w',newline='',encoding='utf8') as f:
+        w=csv.writer(f)
+        #w=csv.writer(sys.stderr)
+        w.writerow(timestamp.keys())
+        w.writerow(timestamp.values())   
+ else:
+    with open("test.csv",'a',newline='',encoding='utf8') as  f:
+        w=csv.writer(f)
+        w.writerow(timestamp.values())
+    
+ 
+ 
