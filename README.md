@@ -10,7 +10,7 @@ and change pini and pfin values in the InverterData.py to point the register's p
 
 # Configuration
 
-Edit the config.cfg and enter the following data:
+Rename the config-org.cfg to config.cfg and enter the following data:
 ```
 [SofarInverter]
 inverter_ip=X.X.X.X             # data logger IP
