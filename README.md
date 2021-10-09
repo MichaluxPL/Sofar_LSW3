@@ -30,7 +30,9 @@ influxdb_host=                  # InfluxDB host (i.e. 127.0.0.1)
 influxdb_port=8086              # InfluxDB port
 influxdb_user=                  # InfluxDB user with permisions to read/write from/to dbname
 influxdb_password=              # User password
-influxdb_dbname=                # Database name 
+influxdb_dbname=                # Database name
+csv=1                           # Set 1 for CSV output 0 for JSON console output (both mqtt and csv must be set to 0 for JSON output)
+csv_file_name=test              # CSV file name (.csv will be added automatically)
 verbose=0                       # Set to 1 for additional info to be presented (registers, binary packets etc.)
 
 File SOFARMap.xml contains MODBUS inverter's registers mapping for Sofar Solar K-TLX product line

@@ -65,6 +65,9 @@ ifport=configParser.get('SofarInverter', 'influxdb_port')
 ifuser=configParser.get('SofarInverter', 'influxdb_user')
 ifpass=configParser.get('SofarInverter', 'influxdb_password')
 ifdb=configParser.get('SofarInverter', 'influxdb_dbname')
+ifdb=configParser.get('SofarInverter', 'influxdb_dbname')
+csv_output=int(configParser.get('SofarInverter', 'csv') )
+csv_file_name=configParser.get('SofarInverter', 'csv_file_name')
 # END CONFIG
 
 timestamp=str(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
@@ -227,23 +230,24 @@ if mqtt==1:
  client.publish(mqtt_topic+"/attributes",output)
  client.publish(mqtt_topic,totalpower)
  print("Data has been sent to MQTT")
-else:
- #jsonoutput=json.loads(output)
- #print(json.dumps(jsonoutput, indent=4, sort_keys=False, ensure_ascii=False))
+# CSV output integration
+if csv_output==1 :
  dictoutput = ast.literal_eval(output)
- timestamp ={"timestamp": datetime.now().strftime("%Y-%m-%d %H:%M")}
- timestamp.update(dictoutput)
- csvfilename="test.csv"
+ dict ={"timestamp": datetime.now().strftime("%Y-%m-%d %H:%M")}
+ dict.update(dictoutput)
+ csvfilename=csv_file_name+".csv"
  if (not os.path.exists(csvfilename)):
-    with open("test.csv",'w',newline='',encoding='utf8') as f:
+    with open(csvfilename,'w',newline='',encoding='utf8') as f:
         w=csv.writer(f)
         #w=csv.writer(sys.stderr)
-        w.writerow(timestamp.keys())
-        w.writerow(timestamp.values())   
+        w.writerow(dict.keys())
+        w.writerow(dict.values())   
  else:
-    with open("test.csv",'a',newline='',encoding='utf8') as  f:
+    with open(csvfilename,'a',newline='',encoding='utf8') as  f:
         w=csv.writer(f)
-        w.writerow(timestamp.values())
-    
+        w.writerow(dict.values())
+if mqtt!=1 and csv_output!=1:
+    jsonoutput=json.loads(output)
+    print(json.dumps(jsonoutput, indent=4, sort_keys=False, ensure_ascii=False))    
  
  
