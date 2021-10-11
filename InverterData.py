@@ -14,6 +14,7 @@ import configparser
 import datetime
 from influxdb import InfluxDBClient
 from datetime import datetime
+from time import sleep
 
 def twosComplement_hex(hexval):
     bits = 16
@@ -245,15 +246,19 @@ if mqtt==1:
       client.publish("sofar/sofar_logger/"+str(inverter_sn)+"/enabled","true")
       client.publish("sofar/sofar_logger/"+str(inverter_sn)+"/state/connected","true")
       for odczyt in odczyty:
-        client.loop_start()
+        sleep(0.05)
+        #if licznik==10 or licznik==20: client.connect(mqtt_server, mqtt_port)
+        #client.loop_start()
      # sensor "energy" dla jednostek produkcji pradu
         if odczyt[2]=="kWh" or odczyt[2]=="Wh" or odczyt[2]=="W":
+         client.connect(mqtt_server, mqtt_port)
          client.publish("sofar/sofar_logger/"+str(inverter_sn)+"/state/"+(odczyt[4])+(odczyt[6]),(odczyt[7]))
          client.publish("homeassistant/sensor/sofar_logger/"+str(inverter_sn)+"_"+str(licznik)+"/config","{\"avty\":{\"topic\":\"sofar/sofar_logger/"+str(inverter_sn)+"/state/connected\",\"payload_available\":\"true\",\"payload_not_available\":\"false\"},\"~\":\"sofar/sofar_logger/"+str(inverter_sn)+"/\",\"device\":{\"ids\":\""+str(inverter_sn)+"\",\"mf\":\"Sofar\",\"name\":\"WLS-3\",\"sw\":\"x.x.x\"},\"name\":\""+(odczyt[0])+" ["+(odczyt[2])+"]\",\"uniq_id\":\""+str(inverter_sn)+"_"+str(licznik)+"\",\"qos\":0,\"unit_of_meas\":\""+(odczyt[2])+"\",\"stat_t\":\"~state/"+(odczyt[4])+(odczyt[6])+"\",\"val_tpl\":\"{{ value | round(5) }}\",\"dev_cla\":\"energy\",\"state_class\":\"total_increasing\"}")
          print ("["+str(licznik)+"]"+odczyt[0])
          licznik=licznik+1
      # reszta sensorow - mozna jeszcze jakies oddzielic
         else:
+         client.connect(mqtt_server, mqtt_port)
          client.publish("sofar/sofar_logger/"+str(inverter_sn)+"/state/"+(odczyt[4])+(odczyt[6]),(odczyt[7]))
          client.publish("homeassistant/sensor/sofar_logger/"+str(inverter_sn)+"_"+str(licznik)+"/config","{\"avty\":{\"topic\":\"sofar/sofar_logger/"+str(inverter_sn)+"/state/connected\",\"payload_available\":\"true\",\"payload_not_available\":\"false\"},\"~\":\"sofar/sofar_logger/"+str(inverter_sn)+"/\",\"device\":{\"ids\":\""+str(inverter_sn)+"\",\"mf\":\"Sofar\",\"name\":\"WLS-3\",\"sw\":\"x.x.x\"},\"name\":\""+(odczyt[0])+" ["+(odczyt[2])+"]\",\"uniq_id\":\""+str(inverter_sn)+"_"+str(licznik)+"\",\"qos\":0,\"unit_of_meas\":\""+(odczyt[2])+"\",\"stat_t\":\"~state/"+(odczyt[4])+(odczyt[6])+"\",\"val_tpl\":\"{{ value | round(5) }}\",\"dev_cla\":\"current\",\"state_class\":\"measurement\"}")
          print ("["+str(licznik)+"]"+odczyt[0])
