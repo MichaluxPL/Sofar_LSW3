@@ -47,7 +47,7 @@ inverter_ip=configParser.get('SofarInverter', 'inverter_ip')
 inverter_port=int(configParser.get('SofarInverter', 'inverter_port'))
 inverter_sn=int(configParser.get('SofarInverter', 'inverter_sn'))
 mqtt=int(configParser.get('SofarInverter', 'mqtt'))
-mqtt_ha_discovery=int(configParser.get('SofarInverter', 'mqtt_ha_discovery'))
+mqtt_ha_discovery=configParser.get('SofarInverter', 'mqtt_ha_discovery')
 mqtt_server=configParser.get('SofarInverter', 'mqtt_server')
 mqtt_port=int(configParser.get('SofarInverter', 'mqtt_port'))
 mqtt_topic=configParser.get('SofarInverter', 'mqtt_topic')
@@ -185,7 +185,7 @@ while chunks<2:
         if verbose=="1": print(hexpos+" - "+title+": "+str(response)+unit);
         if prometheus=="1" and graph==1:
          PMetrics(prometheus_file, metric_name, metric_type, label_name, label_value, response)
-        if mqtt_ha_discovery=="1":
+        if :
          #wyniki do tablicy w celu integracji MQTT z HomeAssistant
          odczyty.append([title, ratio, unit, metric_type, metric_name, label_name, label_value, response,register])
         if influxdb=="1" and graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, response);
@@ -242,10 +242,10 @@ if mqtt==1:
      # wysylanie danych do MQTT z automatycznym wykrywaniem sensorow w HomeAssistant
       licznik=0
       client.connect(mqtt_server, mqtt_port)
-      client.loop_start()
       client.publish("sofar/sofar_logger/"+str(inverter_sn)+"/enabled","true")
       client.publish("sofar/sofar_logger/"+str(inverter_sn)+"/state/connected","true")
       for odczyt in odczyty:
+        client.loop_start()
      # sensor "energy" dla jednostek produkcji pradu
         if odczyt[2]=="kWh" or odczyt[2]=="Wh" or odczyt[2]=="W":
          client.publish("sofar/sofar_logger/"+str(inverter_sn)+"/state/"+(odczyt[4])+(odczyt[6]),(odczyt[7]))
