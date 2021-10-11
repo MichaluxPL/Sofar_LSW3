@@ -185,7 +185,7 @@ while chunks<2:
         if verbose=="1": print(hexpos+" - "+title+": "+str(response)+unit);
         if prometheus=="1" and graph==1:
          PMetrics(prometheus_file, metric_name, metric_type, label_name, label_value, response)
-        if :
+        if mqtt_ha_discovery=="1":
          #wyniki do tablicy w celu integracji MQTT z HomeAssistant
          odczyty.append([title, ratio, unit, metric_type, metric_name, label_name, label_value, response,register])
         if influxdb=="1" and graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, response);
