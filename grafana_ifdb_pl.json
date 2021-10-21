@@ -19,10 +19,12 @@
     ]
   },
   "editable": true,
+  "fiscalYearStartMonth": 0,
   "gnetId": null,
   "graphTooltip": 0,
   "id": 1,
   "links": [],
+  "liveNow": false,
   "panels": [
     {
       "datasource": "InfluxDB",
@@ -69,12 +71,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Całkowity czas pracy"
+              "options": "Całk. czas pracy"
             },
             "properties": [
               {
                 "id": "unit",
-                "value": "h"
+                "value": "godzin"
               },
               {
                 "id": "color",
@@ -82,6 +84,9 @@
                   "fixedColor": "yellow",
                   "mode": "fixed"
                 }
+              },
+              {
+                "id": "decimals"
               }
             ]
           },
@@ -164,9 +169,9 @@
           "values": false
         },
         "text": {},
-        "textMode": "auto"
+        "textMode": "value_and_name"
       },
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.2.1",
       "targets": [
         {
           "alias": "Produkcja dzisiaj",
@@ -295,7 +300,7 @@
           "measurement": "InverterData",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT max(\"SolarTime_Today\") FROM \"InverterData\" WHERE $timeFilter fill(null)",
+          "query": "SELECT max(\"SolarTime_Today\") FROM \"InverterData\" WHERE time>now()-5m fill(null)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -312,7 +317,7 @@
           "tags": []
         },
         {
-          "alias": "Całkowity czas pracy",
+          "alias": "Całk. czas pracy",
           "groupBy": [
             {
               "params": [
@@ -331,7 +336,7 @@
           "measurement": "InverterData",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT max(\"SolarTime_Total\") FROM \"InverterData\" ",
+          "query": "SELECT max(\"SolarTime_Total\") FROM \"InverterData\" WHERE time>now()-5m fill(null)",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series",
@@ -349,6 +354,7 @@
         }
       ],
       "title": "Statystyka pracy paneli",
+      "transparent": true,
       "type": "stat"
     },
     {
@@ -416,7 +422,7 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "dark-blue",
+                  "fixedColor": "dark-purple",
                   "mode": "fixed"
                 }
               },
@@ -451,6 +457,7 @@
       },
       "targets": [
         {
+          "alias": "Moc",
           "groupBy": [
             {
               "params": [
@@ -510,7 +517,7 @@
               "viz": false
             },
             "lineInterpolation": "linear",
-            "lineWidth": 1,
+            "lineWidth": 2,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
@@ -815,7 +822,7 @@
             "mode": "palette-classic"
           },
           "custom": {
-            "axisLabel": "Gerated power",
+            "axisLabel": "Wygenerowana energia",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "bars",
@@ -858,7 +865,7 @@
               }
             ]
           },
-          "unit": "watt"
+          "unit": "watth"
         },
         "overrides": [
           {
@@ -888,7 +895,9 @@
       "options": {
         "legend": {
           "calcs": [
-            "sum"
+            "sum",
+            "min",
+            "max"
           ],
           "displayMode": "list",
           "placement": "bottom"
@@ -899,6 +908,7 @@
       },
       "targets": [
         {
+          "alias": "Produkcja",
           "groupBy": [
             {
               "params": [
@@ -955,6 +965,7 @@
           "custom": {
             "axisLabel": "Gerated power",
             "axisPlacement": "auto",
+            "axisSoftMin": 0,
             "barAlignment": 0,
             "drawStyle": "bars",
             "fillOpacity": 65,
@@ -1037,6 +1048,7 @@
       },
       "targets": [
         {
+          "alias": "Produkcja",
           "groupBy": [
             {
               "params": [
@@ -1080,6 +1092,305 @@
       "timeFrom": "now-1y",
       "timeShift": null,
       "title": "Miesięczna produkcja energii",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "InfluxDB",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "bars",
+            "fillOpacity": 86,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "m"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Dzienny czas pracy"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
+      "id": 27,
+      "interval": null,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max"
+          ],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "alias": "Dzienny czas pracy",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "InverterData",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT max(\"SolarTime_Today\") FROM \"InverterData\" WHERE $timeFilter GROUP BY time(1d) fill(null) tz('Europe/Warsaw')",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "SolarTime_Today"
+                ],
+                "type": "field"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "timeFrom": "2M",
+      "timeShift": null,
+      "title": "Dzienny czas pracy",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "InfluxDB",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "volt"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "L3"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 33
+      },
+      "id": 29,
+      "options": {
+        "legend": {
+          "calcs": [
+            "max"
+          ],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "alias": "L1",
+          "groupBy": [],
+          "measurement": "InverterData",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT max(\"OutputVoltage_L1\") FROM \"InverterData\" WHERE $timeFilter GROUP BY time(1d)",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "OutputVoltage_L1"
+                ],
+                "type": "field"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "L2 ",
+          "groupBy": [],
+          "hide": false,
+          "measurement": "InverterData",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT max(\"OutputVoltage_L2\") FROM \"InverterData\" WHERE $timeFilter GROUP BY time(1d)",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "OutputVoltage_L1"
+                ],
+                "type": "field"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "L3",
+          "groupBy": [],
+          "hide": false,
+          "measurement": "InverterData",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT max(\"OutputVoltage_L3\") FROM \"InverterData\" WHERE $timeFilter GROUP BY time(1d)",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "OutputVoltage_L1"
+                ],
+                "type": "field"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "timeFrom": "now-1y",
+      "timeShift": null,
+      "title": "Maksymalne napięcia wyjściowe",
       "type": "timeseries"
     },
     {
@@ -1189,7 +1500,7 @@
               },
               {
                 "id": "displayName",
-                "value": "L2 (V)"
+                "value": "PV2 (V)"
               }
             ]
           },
@@ -1211,7 +1522,7 @@
         "h": 9,
         "w": 12,
         "x": 12,
-        "y": 24
+        "y": 33
       },
       "id": 24,
       "options": {
@@ -1380,7 +1691,7 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "red",
+                  "fixedColor": "dark-green",
                   "mode": "fixed"
                 }
               },
@@ -1399,30 +1710,7 @@
               {
                 "id": "displayName",
                 "value": "Moduł"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Falownik"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "semi-dark-green",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Moduł"
-            },
-            "properties": [
+              },
               {
                 "id": "color",
                 "value": {
@@ -1438,7 +1726,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 33
+        "y": 42
       },
       "id": 23,
       "options": {
@@ -1504,7 +1792,7 @@
     }
   ],
   "refresh": "",
-  "schemaVersion": 30,
+  "schemaVersion": 31,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -1519,6 +1807,6 @@
   },
   "timezone": "Europe/Warsaw",
   "title": "Panele Fotowoltaiczne",
-  "uid": "53xh9vg12",
-  "version": 93
+  "uid": "53xh9vgRz",
+  "version": 123
 }

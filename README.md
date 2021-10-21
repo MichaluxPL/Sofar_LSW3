@@ -122,7 +122,8 @@ bash:/python3 InverterData.py  (or ./InverterData.py)
 You tell me :)
 
 # Contrib
-Feel free to suggest, rewrite or add whatever you feel is necessary.
+Feel free to suggest :)
+If You want to rewrite or/add change anything - please fork Your own project.
 
 # Home Assistant support (by jlopez77)
 MQTT support into Home Assistant:

@@ -57,3 +57,16 @@ Enjoy :)
 
 ### Fixed
 1. Totaltime and totalpower zeroed befor being sent to MQTT (thx to pablolite for pointing that one out)
+
+## [1.21] - 2021-10-21
+To upgrade overwrite all previous project files.
+
+### Added
+
+### Changed
+1. Prometheus integration code (write to a file all data at once).
+2. Script writes values to InfluxDB/Promtheus/MQTT only if inverter status is Normal.
+   In other states values can be unreliable - especially when inverter is starting in the morning.
+3. Grafana dashboard for InfluxDB datasource was changed and fixed in a few places.
+
+### Fixed

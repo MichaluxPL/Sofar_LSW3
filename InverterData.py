@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# Script gathering solar data from Sofar Solar Inverter (K-TLX) via WiFi module LSW-3
+# Script gathering solar data from Sofar Solar Inverter (K-TLX) via WiFi logger module LSW-3
 # by Michalux (based on DEYE script by jlopez77)
 
 import sys
@@ -22,12 +22,11 @@ def twosComplement_hex(hexval):
         val -= 1 << bits
     return val
 
-# Write metrics for Prometheus
-def PMetrics(mfile, mname, mtype, mlabel, mlvalue, pdata):
+# Prepare metrics for Prometheus
+def PMetrics(mname, mtype, mlabel, mlvalue, pdata):
     line="# TYPE "+mname+" "+mtype+"\n"+mname+"{"+mlabel+"=\""+mlvalue+"\"} "+str(pdata)+"\n"
-    mfile.write(line)
+    PMData.append(line)
 
-# InfluxDB support
 def PrepareInfluxData(IfData, fieldname, fieldvalue):
     IfData[0]["fields"][fieldname]=float(fieldvalue)
     return IfData
@@ -66,9 +65,6 @@ ifdb=configParser.get('SofarInverter', 'influxdb_dbname')
 
 timestamp=str(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
 
-# Initialise Prometheus support
-if prometheus=="1": prometheus_file = open(prometheus_file, "w");
-
 # Initialise InfluxDB support
 if influxdb=="1":
     ifclient = InfluxDBClient(ifhost,ifport,ifuser,ifpass,ifdb);
@@ -87,6 +83,8 @@ pfin=39
 chunks=0
 totalpower=0
 totaltime=0
+PMData=[]
+
 while chunks<2:
  if verbose=="1": print("Chunk no: ", chunks);
 
@@ -172,6 +170,11 @@ while chunks<2:
        response=round(response*ratio,2)
        for option in item["optionRanges"]:
         if option["key"] == response:
+            if label_name=="Status":
+                if response==2:
+                    invstatus=1
+                else:
+                    invstatus=0
             if lang == "PL":
                 response='"'+option["valuePL"]+'"'
             else:
@@ -179,7 +182,7 @@ while chunks<2:
        if hexpos!='0x0015' and hexpos!='0x0016' and hexpos!='0x0017' and hexpos!='0x0018':
         if verbose=="1": print(hexpos+" - "+title+": "+str(response)+unit);
         if prometheus=="1" and graph==1:
-         PMetrics(prometheus_file, metric_name, metric_type, label_name, label_value, response)
+         PMetrics(metric_name, metric_type, label_name, label_value, response)
         if influxdb=="1" and graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, response);
         if unit!="":
             output=output+"\""+ title + " (" + unit + ")" + "\":" + str(response)+","
@@ -191,7 +194,7 @@ while chunks<2:
         if verbose=="1": print(hexpos+" - "+title+": "+str(response*ratio)+unit);
         output=output+"\""+ title + " (" + unit + ")" + "\":" + str(totalpower)+","
         if prometheus=="1" and graph==1:
-         PMetrics(prometheus_file, metric_name, metric_type, label_name, label_value, (totalpower*1000))
+         PMetrics(metric_name, metric_type, label_name, label_value, (totalpower*1000))
         if influxdb=="1" and graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, totalpower);
        if hexpos=='0x0017': totaltime+=response*ratio*65536;
        if hexpos=='0x0018':
@@ -199,7 +202,7 @@ while chunks<2:
         if verbose=="1": print(hexpos+" - "+title+": "+str(response*ratio)+unit);
         output=output+"\""+ title + " (" + unit + ")" + "\":" + str(totaltime)+","
         if prometheus=="1" and graph==1:
-         PMetrics(prometheus_file, metric_name, metric_type, label_name, label_value, totaltime)
+         PMetrics(metric_name, metric_type, label_name, label_value, totaltime)
         if influxdb=="1" and graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, totaltime);
   a+=1
  if chunks==0:
@@ -208,13 +211,21 @@ while chunks<2:
  chunks+=1
 output=output[:-1]+"}"
 
-if prometheus=="1": prometheus_file.close();
-if influxdb=="1":
-    if verbose=="1": print("Influx data: ",InfluxData);
+# Write data to a prometheus integration file
+if prometheus=="1" and invstatus==1:
+    prometheus_file = open(prometheus_file, "w");
+    for i in range(0, len(PMData)):
+        prometheus_file.write(PMData[i])
+        if verbose=="1": print(PMData[i]);
+    prometheus_file.close();
+
+# Write data to Influx DB
+if influxdb=="1" and invstatus==1:
     Write2InfluxDB(InfluxData)
+    if verbose=="1": print("Influx data: ",InfluxData);
 
 # MQTT integration
-if mqtt==1:
+if mqtt==1 and invstatus==1:
  # Initialise MQTT if configured
  client=paho.Client("inverter")
  if mqtt_username!="":
