@@ -1,0 +1,94 @@
+[
+  {
+    "directory": "solar",
+    "items": [
+      {
+        "titleEN": "Product code",
+        "titlePL": "Moc falownika",
+        "registers": ["0x2000"],
+        "optionRanges": [
+          {
+            "key": 0,
+            "valueEN": "5kW",
+            "valuePL": "5kW"
+          },
+          {
+            "key": 1,
+            "valueEN": "6kW",
+            "valuePL": "6kW"
+          },
+          {
+            "key": 2,
+            "valueEN": "8kW",
+            "valuePL": "8kW"
+          },
+          {
+            "key": 3,
+            "valueEN": "10kW",
+            "valuePL": "10kW"
+          },
+          {
+            "key": 4,
+            "valueEN": "12kW",
+            "valuePL": "12kW"
+          },
+          {
+            "key": 5,
+            "valueEN": "15kW",
+            "valuePL": "15kW"
+          },
+          {
+            "key": 6,
+            "valueEN": "17kW",
+            "valuePL": "17kW"
+          },
+          {
+            "key": 7,
+            "valueEN": "20kW",
+            "valuePL": "20kW"
+          },
+          {
+            "key": 8,
+            "valueEN": "25kW",
+            "valuePL": "25kW"
+          },
+          {
+            "key": 9,
+            "valueEN": "30kW",
+            "valuePL": "30kW"
+          }
+        ],
+        "value_type": "Product_Code"
+      }, 
+      {
+        "titleEN": "Serial number",
+        "titlePL": "Numer seryjny",
+        "registers": ["0x2001","0x2002","0x02003","0x2004","0x2005","0x2006","0x2007"],
+        "optionRanges": [],
+        "value_type": "SN"
+      },
+      {
+        "titleEN": "Software Version",
+        "titlePL": "Wersja oprogramowania",
+        "registers": ["0x2008","0x2009"],
+        "optionRanges": [],
+        "value_type": "SV"
+      },
+      {
+        "titleEN": "Hardware Version",
+        "titlePL": "Wersja sprzętu",
+        "registers": ["0x200A","0x200B"],
+        "optionRanges": [],
+        "value_type": "HV"
+      },
+      {
+        "titleEN": "DSP Version",
+        "titlePL": "Wersja DSP",
+        "registers": ["0x200C","0x200D"],
+        "optionRanges": [],
+        "value_type": "DSPV"
+      }
+
+    ]
+  }
+]
