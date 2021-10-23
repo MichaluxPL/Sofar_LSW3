@@ -1,5 +1,6 @@
 # SOFAR Inverter + LSW-3
 Small utility to read data from SOFAR K-TLX inverters through the Solarman (LSW-3) datalogger. 
+Two scripts to get inverter's statistics and hardware info.
 Tested with logger S/N 17xxxxxxx and 21xxxxxxx (protocol V5).
 Requires python3 to run.
 
@@ -115,6 +116,14 @@ bash:/python3 InverterData.py  (or ./InverterData.py)
     "String 7 current (A)": 65.58,
     "String 8 voltage (V)": 402.6,
     "String 8 current (A)": 7.91
+}
+bash:/python3 /InverterHWData.py (or ./InverterHWData.py)
+{
+    "Product code": "5kW",
+    "Serial Number": "SXXXXXXXXXXX",
+    "Software Version": "V270",
+    "Hardware Version": "V100",
+    "DSP Version": "V270"
 }
 ```
 
