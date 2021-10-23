@@ -70,3 +70,14 @@ To upgrade overwrite all previous project files.
 3. Grafana dashboard for InfluxDB datasource was changed and fixed in a few places.
 
 ### Fixed
+
+## [1.3] - 2021-10-23
+To upgrade overwrite all previous project files.
+
+### Added
+1. New script to read hardware/software/SN info from inverter.
+   Two new files: InverterHWData.py (main script) and SOFARHWMap.xml (register configuration)
+
+### Changed
+
+### Fixed
