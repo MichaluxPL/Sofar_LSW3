@@ -890,7 +890,93 @@
         "titlePL": "Kod błędu 1",
         "registers": ["0x0001"],
         "parserRule": 1,
-        "optionRanges": [],
+        "optionRanges": [
+          {
+            "key": 0,
+            "valueEN": "No error",
+            "valuePL": "Brak błędów"
+          },
+          {
+            "key": 1,
+            "valueEN": "ID01 Grid Over Voltage Protection",
+            "valuePL": "ID01 Zabezpieczenie nadnapięciowe sieci"
+          }, 
+          {
+            "key": 2,
+            "valueEN": "ID02 Grid Under Voltage Protection",
+            "valuePL": "ID02 Zabezpieczenie podnapięciowe sieci"
+          }, 
+          {
+            "key": 4,
+            "valueEN": "ID03 Grid Over Frequency Protection",
+            "valuePL": "ID03 Zabezpieczenie sieci przed zbyt wysoką częstotliwością"
+          },
+          {
+            "key": 8,
+            "valueEN": "ID04 Grid Under Frequency Protection",
+            "valuePL": "ID03 Zabezpieczenie sieci przed zbyt niską częstotliwością"
+          },
+          {
+            "key": 16,
+            "valueEN": "ID05 PV Under Voltage Protection",
+            "valuePL": "ID05 Zabezpieczenie podnapięciowe PV"
+          },
+          {
+            "key": 32,
+            "valueEN": "ID06 Grid Low Voltage Ride through",
+            "valuePL": "ID06 Chwilowy spadek napięcia sieci (LVRT)"
+          },
+          {
+            "key": 64,
+            "valueEN": "ID07",
+            "valuePL": "ID07"
+          }, 
+          {
+            "key": 128,
+            "valueEN": "ID08",
+            "valuePL": "ID08"
+          },
+          {
+            "key": 256,
+            "valueEN": "ID09 PV Over Voltage Protection",
+            "valuePL": "ID09 Zabezpieczenie nadnapięciowe PV"
+          },
+          {
+            "key": 512,
+            "valueEN": "ID10 PV Input Current Unbalanced",
+            "valuePL": "ID10 Niezrównoważony prąd wejściowy PV"
+          },
+          {
+            "key": 1024,
+            "valueEN": "ID11 PV Input Mode wrong configuration",
+            "valuePL": "ID11 Błędna konfiguracja trybu wejśćiowego PV (Input Mode)"
+          },
+          {
+            "key": 2048,
+            "valueEN": "ID12 Ground-Fault circuit interrupters fault",
+            "valuePL": "ID12 Błąd uziemienia przerywacza"
+          },
+          {
+            "key": 4096,
+            "valueEN": "ID13 Phase sequence fault",
+            "valuePL": "ID13 Błąd sekwencji fazy"
+          },
+          {
+            "key": 8192,
+            "valueEN": "ID14 Hardware boost over current protection",
+            "valuePL": "ID14 Zabezpieczenie nadprądowe wzmocnienia sprzętowego"
+          },
+          {
+            "key": 16384,
+            "valueEN": "ID15 Hardware AC over current protection",
+            "valuePL": "ID15 Zabezpieczenie nadprądowe prądu zmiennego" 
+          },
+          {
+            "key": 32768,
+            "valueEN": "ID16 Grid current is too high",
+            "valuePL": "ID16 Zbyt wysokie napięcie sieci"
+          }
+        ],
         "ratio": 1,
         "unit": "",
         "graph": 0,
@@ -904,7 +990,93 @@
         "titlePL": "Kod błędu 2",
         "registers": ["0x0002"],
         "parserRule": 1,
-        "optionRanges": [],
+        "optionRanges": [
+          {
+            "key": 0,
+            "valueEN": "No error",
+            "valuePL": "Brak błędów"
+          },
+          {
+            "key": 1, 
+            "valueEN": "ID17 Grid current sampling error",
+            "valuePL": "ID17 Błąd próbkowania prądu sieci"
+          },
+          { 
+            "key": 2,
+            "valueEN": "ID18 DCI sampling error",
+            "valuePL": "ID18 Błąd próbkowania przetwornicy prądu stałego"
+          },
+          { 
+            "key": 4,
+            "valueEN": "ID19 Grid voltage sampling error",
+            "valuePL": "ID19 Błąd próbkowania napięcia sieci"
+          },
+          { 
+            "key": 8,
+            "valueEN": "ID20 GFCI device sampling error",
+            "valuePL": "ID20 Błąd próbkowania ziemnozwarciowego przerywacza obwodu"
+          },
+          { 
+            "key": 16, 
+            "valueEN": "ID21 Main chip fault",
+            "valuePL": "ID21 Błąd głównego układu elektronicznego"
+          },
+          { 
+            "key": 32,
+            "valueEN": "ID22 Hardware auxiliary power fault",
+            "valuePL": "ID22 Błąd zasilania zapasowego"
+          },
+          { 
+            "key": 64, 
+            "valueEN": "ID23 Bus voltage zero fault",
+            "valuePL": "ID23 Zanik napięcia szyny"
+          }, 
+          { 
+            "key": 128,
+            "valueEN": "ID24 Output current not balanced",
+            "valuePL": "ID24 Niezrównoważony prąd wyjściowy"
+          },
+          {
+            "key": 256,
+            "valueEN": "ID25 Bus under voltage protection",
+            "valuePL": "ID25 Zabezpieczenie podnapięciowe szyny"
+          },
+          {
+            "key": 512,
+            "valueEN": "ID26 Bus over voltage protection",
+            "valuePL": "ID26 Zabezpieczenie nadnapięciowe szyny"
+          },
+          {
+            "key": 1024,
+            "valueEN": "ID27 Bus voltage unbalanced",
+            "valuePL": "ID27 Niezrównoważone napięcie szyny"
+          },
+          {
+            "key": 2048,
+            "valueEN": "ID28 DCI is too high",
+            "valuePL": "ID28 Zbyt wysoki prąd stały przetwornika"
+          },
+          {
+            "key": 4096,
+            "valueEN": "ID29 Grid current is too high",
+            "valuePL": "ID29 Zbyt wysokie natężenie prądu sieci"
+          },
+          {
+            "key": 8192,
+            "valueEN": "ID30 Input current is too high",
+            "valuePL": "ID30 Zbyt wysokie natężenie prądu wejściowego"
+          },
+          {
+            "key": 16384,
+            "valueEN": "ID31",
+            "valuePL": "ID31"
+          },
+          {
+            "key": 32768,
+            "valueEN": "ID32",
+            "valuePL": "ID32"
+          }
+        ],
         "ratio": 1,
         "unit": "",
         "graph": 0,
@@ -918,7 +1090,93 @@
         "titlePL": "Kod błędu 3",
         "registers": ["0x0003"],
         "parserRule": 1,
-        "optionRanges": [],
+        "optionRanges": [
+          {
+            "key": 0,
+            "valueEN": "No error",
+            "valuePL": "Brak błędów"
+          },
+          {
+            "key": 1, 
+            "valueEN": "ID33 Reserved",
+            "valuePL": "ID33 Zarezerwowane"
+          }, 
+          { 
+            "key": 2,
+            "valueEN": "ID34 Reserved",
+            "valuePL": "ID34 Zarezerwowane"
+          }, 
+          { 
+            "key": 4,
+            "valueEN": "ID35 Reserved",
+            "valuePL": "ID35 Zarezerwowane"
+          },
+          { 
+            "key": 8,
+            "valueEN": "ID36 Reserved",
+            "valuePL": "ID36 Zarezerwowane"
+          },
+          { 
+            "key": 16,
+            "valueEN": "ID37 Reserved",
+            "valuePL": "ID37 Zarezerwowane"
+          },
+          { 
+            "key": 32,
+            "valueEN": "ID38 Reserved",
+            "valuePL": "ID38 Zarezerwowane"
+          },
+          { 
+            "key": 64, 
+            "valueEN": "ID39 Reserved",
+            "valuePL": "ID39 Zarezerwowane"
+          }, 
+          { 
+            "key": 128,
+            "valueEN": "ID40 Reserved",
+            "valuePL": "ID40 Zarezerwowane"
+          },
+          {
+            "key": 256, 
+            "valueEN": "ID41 Reserved",
+            "valuePL": "ID41 Zarezerwowane"
+          }, 
+          { 
+            "key": 512,
+            "valueEN": "ID42 Reserved",
+            "valuePL": "ID42 Zarezerwowane"
+          }, 
+          { 
+            "key": 1024,
+            "valueEN": "ID43 Reserved",
+            "valuePL": "ID43 Zarezerwowane"
+          },
+          { 
+            "key": 2048,
+            "valueEN": "ID44 Reserved",
+            "valuePL": "ID44 Zarezerwowane"
+          },
+          { 
+            "key": 4096,
+            "valueEN": "ID45 Reserved",
+            "valuePL": "ID45 Zarezerwowane"
+          },
+          { 
+            "key": 8192,
+            "valueEN": "ID46 Reserved",
+            "valuePL": "ID46 Zarezerwowane"
+          },
+          { 
+            "key": 16384, 
+            "valueEN": "ID47 Reserved",
+            "valuePL": "ID47 Zarezerwowane"
+          }, 
+          { 
+            "key": 32768,
+            "valueEN": "ID48 Reserved",
+            "valuePL": "ID48 Zarezerwowane"
+          } 
+        ],
         "ratio": 1,
         "unit": "",
         "graph": 0,
@@ -932,7 +1190,93 @@
         "titlePL": "Kod błędu 4",
         "registers": ["0x0004"],
         "parserRule": 1,
-        "optionRanges": [],
+        "optionRanges": [
+          {
+            "key": 0,
+            "valueEN": "No error",
+            "valuePL": "Brak błędów"
+          },
+          {
+            "key": 1, 
+            "valueEN": "ID49 Grid voltage sampling value between master and slave DSP vary widely",
+            "valuePL": "ID49 Duża różnica w poziomie próbkowania napięcia sieci pomiędzy nadrzędnym i podrzędnym DSP"
+          }, 
+          { 
+            "key": 2,
+            "valueEN": "ID50 Grid frequency sampling value between master and slave DSP vary widely",
+            "valuePL": "ID50 Duża różnica w poziomie próbkowania częstotliwości pomiędzy nadrzędnym i podrzędnym DSP"
+          }, 
+          { 
+            "key": 4,
+            "valueEN": "ID51 DCI sampling value between master and slave DSP vary widely",
+            "valuePL": "ID51 Duża różnica w poziomie próbkowania napięca stałego pomiędzy nadrzędnym i podrzędnym DSP"
+          },
+          { 
+            "key": 8,
+            "valueEN": "ID52 GFCI sampling value between master and slave DSP vary widely",
+            "valuePL": "ID52 Duża różnica w poziomie próbkowania ziemnozwarciowego przerywacza obwodu pomiędzy nadrzędnym i podrzędnym DSP "
+          },
+          { 
+            "key": 16,
+            "valueEN": "ID53 Communication failure between master and slave DSP failure",
+            "valuePL": "ID53 Błąd komunikacj pomiędzy nadrzędnym i podrzędnym DSP"
+          },
+          { 
+            "key": 32,
+            "valueEN": "ID53 Communication failure between slave and communication board",
+            "valuePL": "ID53 Błąd komunikacji pomiędzy podrzędnym DSP i panelem komunikacyjnym"
+          },
+          { 
+            "key": 64, 
+            "valueEN": "ID55 Relay fault",
+            "valuePL": "ID55 Błąd przekaźnika"
+          }, 
+          { 
+            "key": 128,
+            "valueEN": "ID56 Insulation resistance between PV array and the earth is too low",
+            "valuePL": "ID56 Zbyt niski poziom oporu uziemienia"
+          },
+          {
+            "key": 256,
+            "valueEN": "ID57 Inverter temp is too high",
+            "valuePL": "ID57 Zbyt wysoka temperatura falownika"
+          },
+          {
+            "key": 512,
+            "valueEN": "ID58 Boost temp is too high",
+            "valuePL": "ID58 Zbyt wysoka temperatura wzmacniacza"
+          },
+          {
+            "key": 1024,
+            "valueEN": "ID59 Environment temp is too high",
+            "valuePL": "ID59 Zbyt wysoka temperatura otoczenia"
+          },
+          {
+            "key": 2048,
+            "valueEN": "ID60 Inverter not connected to the PE wire",
+            "valueEN": "ID60 Brak podłączenie falownika do kabla PE"
+          },
+          {
+            "key": 4096,
+            "valueEN": "ID61 Reserved",
+            "valuePL": "ID61 Zarezerwowane"
+          },
+          {
+            "key": 8192,
+            "valueEN": "ID62 Reserved",
+            "valuePL": "ID62 Zarezerwowane"
+          },
+          {
+            "key": 16384,
+            "valueEN": "ID63 Reserved",
+            "valuePL": "ID63 Zarezerwowane"
+          },
+          {
+            "key": 32768,
+            "valueEN": "ID64 Reserved",
+            "valuePL": "ID64 Zarezerwowane"
+          }
+        ],
         "ratio": 1,
         "unit": "",
         "graph": 0,
@@ -946,7 +1290,93 @@
         "titlePL": "Kod błędu 5",
         "registers": ["0x0005"],
         "parserRule": 1,
-        "optionRanges": [],
+        "optionRanges": [
+          {
+            "key": 0,
+            "valueEN": "No error",
+            "valuePL": "Brak błędów"
+          },
+          {
+            "key": 1, 
+            "valueEN": "ID65 Grid current is too high and causes unrecoverable fault",
+            "valuePL": "ID65 Zbyt wysokie natężenie prądu sieci"
+          }, 
+          { 
+            "key": 2,
+            "valueEN": "ID66 Bus voltage is too high and causes unrecoverable fault",
+            "valuePL": "ID66 Zbyt wysokie napięcie szyny"
+          }, 
+          { 
+            "key": 4,
+            "valueEN": "ID67 Grid current is unbalanced and causes unrecoverable fault",
+            "valuePL": "ID67 Niezrównoważony prąd sieci"
+          },
+          { 
+            "key": 8,
+            "valueEN": "ID68 Input current is unbalanced and causes unrecoverable fault",
+            "valuePL": "ID68 Niezrównoważony prąd na wejściu"
+          },
+          { 
+            "key": 16,
+            "valueEN": "ID69 Bus voltage is unbalanced and causes unrecoverable fault",
+            "valuePL": "ID69 Niezrównoważone napięcie szyny"
+          },
+          { 
+            "key": 32,
+            "valueEN": "ID70 Grid current is too high and causes unrecoverable fault",
+            "valuePL": "ID70 Zbyt wysokie natężenie prądu sieci"
+          },
+          { 
+            "key": 64,
+            "valueEN": "ID65 PV Input Mode Configuration is wrong and causes unrecoverable fault",
+            "valuePL": "ID65 Błędna konfiguracja trybu wejściowego PV"
+          }, 
+          { 
+            "key": 128,
+            "valueEN": "ID72 Reserved",
+            "valuePL": "ID72 Zarezerwowane"
+          },
+          {
+            "key": 256,
+            "valueEN": "ID73 Reserved",
+            "valuePL": "ID73 Zarezerwowane"
+          },
+          {
+            "key": 512,
+            "valueEN": "ID74 Input current is too high and causes unrecoverable fault",
+            "valuePL": "ID74 Zbyt wysokie natężenie prądu na wejściu"
+          },
+          {
+            "key": 1024,
+            "valueEN": "ID75 Error reading from EEPROM",
+            "valuePL": "ID75 Błąd odczytu pamięci EEPROM"
+          },
+          {
+            "key": 2048,
+            "valueEN": "ID76 Error writing to EEPROM",
+            "valuePL": "ID76 Błąd zapisu do pamięci EEPROM"
+          },
+          {
+            "key": 4096,
+            "valueEN": "ID77 Relay fauilure causes unrecoverable fault",
+            "valuePL": "ID77 Błąd przekaźnika"
+          },
+          {
+            "key": 8192,
+            "valueEN": "ID78 Reserved",
+            "valuePL": "ID78 Zarezerwowane"
+          },
+          {
+            "key": 16384,
+            "valueEN": "ID79 Reserved",
+            "valuePL": "ID79 Zarezerwowane"
+          },
+          {
+            "key": 32768,
+            "valueEN": "ID80 Reserved",
+            "valuePL": "ID80 Zarezerwowane"
+          }
+        ],
         "ratio": 1,
         "unit": "",
         "graph": 0,
