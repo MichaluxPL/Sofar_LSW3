@@ -81,3 +81,15 @@ To upgrade overwrite all previous project files.
 ### Changed
 
 ### Fixed
+
+## [1.4] - 2021-10-28
+A few additions and changes.
+
+### Added
+1. New parameters in config.cfg to define register address ranges
+2. Checking if logger response is correct (no empty values for defined registers). If not - report end exit.
+
+### Changed
+1. config.cfg format has slightly changed
+
+### Fixed

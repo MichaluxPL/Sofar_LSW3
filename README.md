@@ -1,11 +1,11 @@
 # SOFAR Inverter + LSW-3
-Small utility to read data from SOFAR K-TLX inverters through the Solarman (LSW-3) datalogger. 
+Small utility to read data from SOFAR K-TLX inverters through the Solarman (LSW-3/LSE) datalogger. 
 Two scripts to get inverter's statistics and hardware info.
 Tested with logger S/N 17xxxxxxx and 21xxxxxxx (protocol V5).
 Requires python3 to run.
 
 REMARK: To make it work with other inverter brand/model connected via LSW-3 you need to alter the .xml file accordingly
-and change pini and pfin values in the InverterData.py to point the register's position start/end.
+and change register start/end numbers in config.cfg
 
 *Thanks to @jlopez77 https://github.com/jlopez77 for a big part of the code.*
 
@@ -17,22 +17,32 @@ Edit the config.cfg and enter the following data:
 inverter_ip=X.X.X.X             # data logger IP
 inverter_port=8899              # data logger port
 inverter_sn=XXXXXXXXXX          # data logger S/N
-mqtt=1                          # set to 1 for MQTT output, 0 for JSON output.
-mqtt_server=192.168.X.X
-mqtt_port=1883
-mqtt_topic=XXXXXXXXXXXX
-mqtt_username=
-mqtt_passwd=
+register_start1=0x0000          # Inverter register's first MODBUS address for the first register's range
+register_end1=0x0027            # Inverter register's last MODBUS address for the first register's range
+register_start2=0x0105          # Inverter register's first MODBUS address for a second register's range
+register_end2=0x0114            # Inverter register's last MODBUS address for a second register's range
 lang=                           # Output language (available: PL,EN)
+verbose=0                       # Set to 1 for additional info to be presented (registers, binary packets etc.)
+
+[Prometheus]
 prometheus=0                    # set to 1 to export data in Prometheus metrics format
 prometheus_file=/xx/xx/metrics/index.html  # Path to Prometheus metrics file served by web server
+
+[InfluxDB]
 influxdb=0                      # set to 1 to export data to InfluxDB
 influxdb_host=                  # InfluxDB host (i.e. 127.0.0.1)
 influxdb_port=8086              # InfluxDB port
 influxdb_user=                  # InfluxDB user with permisions to read/write from/to dbname
 influxdb_password=              # User password
 influxdb_dbname=                # Database name 
-verbose=0                       # Set to 1 for additional info to be presented (registers, binary packets etc.)
+
+[MQTT]
+mqtt=1                          # set to 1 for MQTT output, 0 for JSON output.
+mqtt_server=192.168.X.X
+mqtt_port=1883
+mqtt_topic=XXXXXXXXXXXX
+mqtt_username=
+mqtt_passwd=
 
 File SOFARMap.xml contains MODBUS inverter's registers mapping for Sofar Solar K-TLX product line
 and Prometheus metrics configuration.
@@ -63,11 +73,11 @@ SOFARMap.xml structure and fields definition:
 bash:/python3 InverterData.py  (or ./InverterData.py)
 {
     "Inverter status": "Normal",
-    "Fault 1": 0,
-    "Fault 2": 0,
-    "Fault 3": 0,
-    "Fault 4": 0,
-    "Fault 5": 0,
+    "Fault 1": "No error",
+    "Fault 2": "No error",
+    "Fault 3": "No error",
+    "Fault 4": "No error",
+    "Fault 5": "No error",
     "PV1 Voltage (V)": 403.7,
     "PV1 Current (A)": 0.14,
     "PV2 Voltage (V)": 78.9,
@@ -135,7 +145,7 @@ Feel free to suggest :)
 If You want to rewrite or/add change anything - please fork Your own project.
 
 # Home Assistant support (by jlopez77)
-MQTT support into Home Assistant:
+MQTT support into Home Assistant (there are reports it is broken :( )
 ```
   - platform: mqtt
     name: "SofarInverter"

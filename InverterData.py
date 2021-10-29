@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# Script gathering solar data from Sofar Solar Inverter (K-TLX) via WiFi logger module LSW-3
+# Script gathering solar data from Sofar Solar Inverter (K-TLX) via logger module LSW-3/LSE
 # by Michalux (based on DEYE script by jlopez77)
 
 import sys
@@ -15,7 +15,11 @@ import datetime
 from influxdb import InfluxDBClient
 from datetime import datetime
 
-def twosComplement_hex(hexval):
+def twosComplement_hex(hexval, reg):
+    if hexval=="":
+        print("No value in response for register "+reg)
+        print("Check register start/end values in config.cfg")
+        sys.exit(1)
     bits = 16
     val = int(hexval, bits)
     if val & (1 << (bits-1)):
@@ -27,6 +31,7 @@ def PMetrics(mname, mtype, mlabel, mlvalue, pdata):
     line="# TYPE "+mname+" "+mtype+"\n"+mname+"{"+mlabel+"=\""+mlvalue+"\"} "+str(pdata)+"\n"
     PMData.append(line)
 
+# Prepare data to write do InfluxDB
 def PrepareInfluxData(IfData, fieldname, fieldvalue):
     IfData[0]["fields"][fieldname]=float(fieldvalue)
     return IfData
@@ -35,7 +40,6 @@ def Write2InfluxDB(IfData):
     ifclient.write_points(IfData);
 
 os.chdir(os.path.dirname(sys.argv[0]))
-#os.chdir("/home/pi/solarman/SofarInverter")
 
 # CONFIG
 configParser = configparser.RawConfigParser()
@@ -45,22 +49,26 @@ configParser.read(configFilePath)
 inverter_ip=configParser.get('SofarInverter', 'inverter_ip')
 inverter_port=int(configParser.get('SofarInverter', 'inverter_port'))
 inverter_sn=int(configParser.get('SofarInverter', 'inverter_sn'))
-mqtt=int(configParser.get('SofarInverter', 'mqtt'))
-mqtt_server=configParser.get('SofarInverter', 'mqtt_server')
-mqtt_port=int(configParser.get('SofarInverter', 'mqtt_port'))
-mqtt_topic=configParser.get('SofarInverter', 'mqtt_topic')
-mqtt_username=configParser.get('SofarInverter', 'mqtt_username')
-mqtt_passwd=configParser.get('SofarInverter', 'mqtt_passwd')
+reg_start1=(int(configParser.get('SofarInverter', 'register_start1'),0))
+reg_end1=(int(configParser.get('SofarInverter', 'register_end1'),0))
+reg_start2=(int(configParser.get('SofarInverter', 'register_start2'),0))
+reg_end2=(int(configParser.get('SofarInverter', 'register_end2'),0))
 lang=configParser.get('SofarInverter', 'lang')
 verbose=configParser.get('SofarInverter', 'verbose')
-prometheus=configParser.get('SofarInverter', 'prometheus')
-prometheus_file=configParser.get('SofarInverter', 'prometheus_file')
-influxdb=configParser.get('SofarInverter', 'influxdb')
-ifhost=configParser.get('SofarInverter', 'influxdb_host')
-ifport=configParser.get('SofarInverter', 'influxdb_port')
-ifuser=configParser.get('SofarInverter', 'influxdb_user')
-ifpass=configParser.get('SofarInverter', 'influxdb_password')
-ifdb=configParser.get('SofarInverter', 'influxdb_dbname')
+prometheus=configParser.get('Prometheus', 'prometheus')
+prometheus_file=configParser.get('Prometheus', 'prometheus_file')
+influxdb=configParser.get('InfluxDB', 'influxdb')
+ifhost=configParser.get('InfluxDB', 'influxdb_host')
+ifport=configParser.get('InfluxDB', 'influxdb_port')
+ifuser=configParser.get('InfluxDB', 'influxdb_user')
+ifpass=configParser.get('InfluxDB', 'influxdb_password')
+ifdb=configParser.get('InfluxDB', 'influxdb_dbname')
+mqtt=int(configParser.get('MQTT', 'mqtt'))
+mqtt_server=configParser.get('MQTT', 'mqtt_server')
+mqtt_port=int(configParser.get('MQTT', 'mqtt_port'))
+mqtt_topic=configParser.get('MQTT', 'mqtt_topic')
+mqtt_username=configParser.get('MQTT', 'mqtt_username')
+mqtt_passwd=configParser.get('MQTT', 'mqtt_passwd')
 # END CONFIG
 
 timestamp=str(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
@@ -78,8 +86,8 @@ if influxdb=="1":
 
 # PREPARE & SEND DATA TO THE INVERTER
 output="{" # initialise json output
-pini=0
-pfin=39
+pini=reg_start1
+pfin=reg_end1
 chunks=0
 totalpower=0
 totaltime=0
@@ -94,6 +102,7 @@ while chunks<2:
  controlcode= binascii.unhexlify('1045') #controlCode
  serial=binascii.unhexlify('0000') # serial
  datafield = binascii.unhexlify('020000000000000000000000000000') #com.igen.localmode.dy.instruction.send.SendDataField
+ #pos_ini=str(hex(pini)[2:4].zfill(2))+str(hex(pini)[4:6].zfill(2))
  pos_ini=str(hex(pini)[2:4].zfill(4))
  pos_fin=str(hex(pfin-pini+1)[2:4].zfill(4))
  businessfield= binascii.unhexlify('0103' + pos_ini + pos_fin) # sin CRC16MODBUS
@@ -148,8 +157,8 @@ while chunks<2:
  while a<=i:
   p1=56+(a*4)
   p2=60+(a*4)
-  response=twosComplement_hex(str(''.join(hex(ord(chr(x)))[2:].zfill(2) for x in bytearray(data))+'  '+re.sub('[^\x20-\x7f]', '', ''))[p1:p2])
   hexpos=str("0x") + str(hex(a+pini)[2:].zfill(4)).upper()
+  response=twosComplement_hex(str(''.join(hex(ord(chr(x)))[2:].zfill(2) for x in bytearray(data))+'  '+re.sub('[^\x20-\x7f]', '', ''))[p1:p2], hexpos)
   with open("./SOFARMap.xml") as txtfile:
    parameters=json.loads(txtfile.read())
   for parameter in parameters:
@@ -206,8 +215,8 @@ while chunks<2:
         if influxdb=="1" and graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, totaltime);
   a+=1
  if chunks==0:
-  pini=261
-  pfin=276
+  pini=reg_start2
+  pfin=reg_end2
  chunks+=1
 output=output[:-1]+"}"
 
