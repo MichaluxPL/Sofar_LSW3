@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# Script gathering product data from Sofar Solar Inverter (K-TLX) via WiFi logger module LSW-3
+# Script gathering product data from Sofar Solar Inverter (K-TLX) via logger module LSW-3/LSE
 # by Michalux
 
 import sys
@@ -28,6 +28,8 @@ configParser.read(configFilePath)
 inverter_ip=configParser.get('SofarInverter', 'inverter_ip')
 inverter_port=int(configParser.get('SofarInverter', 'inverter_port'))
 inverter_sn=int(configParser.get('SofarInverter', 'inverter_sn'))
+reg_start=(int(configParser.get('SofarInverter', 'registerhw_start'),0)) # Starting modbus register address (from ModBus-RTU Communication Protocol doc)
+reg_end=(int(configParser.get('SofarInverter', 'registerhw_end'),0)) # End modbus register address (from ModBus-RTU Communication Protocol doc)
 lang=configParser.get('SofarInverter', 'lang')
 verbose=configParser.get('SofarInverter', 'verbose')
 # END CONFIG
@@ -35,8 +37,8 @@ verbose=configParser.get('SofarInverter', 'verbose')
 # PREPARE & SEND DATA TO INVERTER via LOGGER MODULE
 output="{" # initialise json output
 
-pini=8192 # Starting modbus register address (from ModBus-RTU Communication Protocol doc)
-pfin=8205 # End modbus register address (from ModBus-RTU Communication Protocol doc)
+pini=reg_start
+pfin=reg_end
 
 SN="\""
 SV="\""

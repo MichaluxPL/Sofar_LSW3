@@ -4,8 +4,8 @@ Two scripts to get inverter's statistics and hardware info.
 Tested with logger S/N 17xxxxxxx and 21xxxxxxx (protocol V5).
 Requires python3 to run.
 
-REMARK: To make it work with other inverter brand/model connected via LSW-3 you need to alter the .xml file accordingly
-and change register start/end numbers in config.cfg
+REMARK: To make it work with other inverter brand/model connected via LSW-3/LSE you might need to alter
+the register's addresses in the .xml files accordingly and change register start/end numbers in config.cfg
 
 *Thanks to @jlopez77 https://github.com/jlopez77 for a big part of the code.*
 
@@ -17,10 +17,12 @@ Edit the config.cfg and enter the following data:
 inverter_ip=X.X.X.X             # data logger IP
 inverter_port=8899              # data logger port
 inverter_sn=XXXXXXXXXX          # data logger S/N
-register_start1=0x0000          # Inverter register's first MODBUS address for the first register's range
+register_start1=0x0000          # Inverter register's first MODBUS address for the first register's range.
 register_end1=0x0027            # Inverter register's last MODBUS address for the first register's range
 register_start2=0x0105          # Inverter register's first MODBUS address for a second register's range
 register_end2=0x0114            # Inverter register's last MODBUS address for a second register's range
+registerhw_start=0x2000         # Like above, but for InverterHWData.py
+registerhw_end=0x200D           # Like above, but for InverterHWData.py
 lang=                           # Output language (available: PL,EN)
 verbose=0                       # Set to 1 for additional info to be presented (registers, binary packets etc.)
 
@@ -44,24 +46,24 @@ mqtt_topic=XXXXXXXXXXXX
 mqtt_username=
 mqtt_passwd=
 
-File SOFARMap.xml contains MODBUS inverter's registers mapping for Sofar Solar K-TLX product line
-and Prometheus metrics configuration.
-Edit i.e. to get different language, other Prometheus/InfluxDB metrics names or
+Files SOFARMap.xml and SOFARHWMap.xml contain MODBUS inverter's registers mapping for Sofar Solar K-TLX product line
+and Prometheus/InfluxDB metrics configuration.
+Edit i.e. to get captions in a different language, change Prometheus/InfluxDB metrics names or
 if Your inverter has different register's numbers.
-SOFARMap.xml structure and fields definition:
+Example SOFARMap.xml structure and fields definition (similar for SOFARHWMap.xml):
 "directory": "solar",               # Id
     "items": [
       {
         "titleEN": "PV1 Power",     # English JSON output name 
         "titlePL": "Moc PV1",       # Polish JSON output name
-        "registers": ["0x000A"],    # Inverter's register address
+        "registers": ["0x000A"],    # Inverter's register address (must be in range configured in the config file)
         "parserRule": 1,            # Currently unused
         "optionRanges": [],         # For numeric value to text label mappings
-        "ratio": 10,                # Value ratio
+        "ratio": 10,                # Value ratio (will be used to multiply response value)
         "unit": "W",                # Value unit
         "graph": 1,                 # Set to 1, to export value to Prometheus/InfluxDB
         "metric_type": "gauge",     # Prometheus metric type
-        "metric_name": "SolarPower",# Prometheus/InfluxDB name
+        "metric_name": "SolarPower",# Prometheus/InfluxDB container name
         "label_name": "Power",      # Prometheus/InfluxDB label name
         "label_value": "PV1"        # Prometheus/InfluxDB value name
       }
