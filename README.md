@@ -138,7 +138,7 @@ bash:/python3 /InverterHWData.py (or ./InverterHWData.py)
 ```
 
 # Known Issues
-You tell me :)
+MQTT support reported to be broken :(
 
 # Contrib
 Feel free to suggest :)
