@@ -69,6 +69,7 @@ mqtt_port=int(configParser.get('MQTT', 'mqtt_port'))
 mqtt_topic=configParser.get('MQTT', 'mqtt_topic')
 mqtt_username=configParser.get('MQTT', 'mqtt_username')
 mqtt_passwd=configParser.get('MQTT', 'mqtt_passwd')
+mqtt_ssl=configParser.get('MQTT', 'mqtt_ssl')
 # END CONFIG
 
 timestamp=str(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
@@ -238,8 +239,9 @@ if mqtt==1 and invstatus==1:
  # Initialise MQTT if configured
  client=paho.Client("inverter")
  if mqtt_username!="":
-  client.tls_set()  # <--- even without arguments
   client.username_pw_set(username=mqtt_username, password=mqtt_passwd)
+ if mqtt_ssl==1:
+  client.tls_set()  # <--- even without arguments
  client.connect(mqtt_server, mqtt_port)
  client.publish(mqtt_topic+"/attributes",output)
  client.publish(mqtt_topic,totalpower)
