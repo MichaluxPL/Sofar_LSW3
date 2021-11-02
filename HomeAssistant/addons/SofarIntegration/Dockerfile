@@ -28,7 +28,7 @@ RUN apk del gcc \
 WORKDIR /data
 
 # RUN rm -Rf Sofar_LSW3; git clone https://github.com/MichaluxPL/Sofar_LSW3.git /data/Sofar_LSW3
-RUN rm -Rf Sofar_LSW3; git clone http://nas.marm:30000/MARM.pl/Sofar_LSW3.marm.git /data/Sofar_LSW3
+RUN rm -Rf Sofar_LSW3; git clone https://github.com/rysiulg/Sofar_LSW3.git /data/Sofar_LSW3
 
 # Copy data for add-on
 COPY run.sh /
