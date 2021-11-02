@@ -12,8 +12,10 @@ influxdb=$(bashio::config 'influxdb')
 [ "$influxdb" = "true" ] && influxdb="1" || influxdb="0"
 mqtt=$(bashio::config 'mqtt')
 [ "$mqtt" = "true" ] && mqtt="1" || mqtt="0"
-mqtt_ssl=$(bashio::config 'mqtt_ssl')
-[ "$mqtt_ssl" = "true" ] && mqtt_ssl="1" || mqtt_ssl="0"
+mqtt_tls=$(bashio::config 'mqtt_tls')
+[ "$mqtt_tls" = "true" ] && mqtt_tls="1" || mqtt_tls="0"
+mqtt_tls_insecure=$(bashio::config 'mqtt_tls_insecure')
+[ "$mqtt_tls_insecure" = "true" ] && mqtt_tls_insecure="1" || mqtt_tls_insecure="0"
 echo "[SofarInverter]" >$cfgpath/config.cfg
 echo "inverter_ip=$(bashio::config 'inverter_ip')" >>$cfgpath/config.cfg
 echo "inverter_port=$(bashio::config 'inverter_port')" >>$cfgpath/config.cfg
@@ -43,7 +45,10 @@ echo "mqtt_port=$(bashio::config 'mqtt_port')" >>$cfgpath/config.cfg
 echo "mqtt_topic=$(bashio::config 'mqtt_topic')" >>$cfgpath/config.cfg
 echo "mqtt_username=$(bashio::config 'mqtt_username')" >>$cfgpath/config.cfg
 echo "mqtt_passwd=$(bashio::config 'mqtt_password')" >>$cfgpath/config.cfg
-echo "mqtt_ssl=$mqtt_ssl" >>$cfgpath/config.cfg
+echo "mqtt_tls=$mqtt_tls" >>$cfgpath/config.cfg
+echo "mqtt_tls_insecure=$mqtt_tls_insecure" >>$cfgpath/config.cfg
+echo "mqtt_tls_version=$(bashio::config 'mqtt_tls_version')" >>$cfgpath/config.cfg
+echo "mqtt_cacert=$(bashio::config 'mqtt_cacert')" >>$cfgpath/config.cfg
 #cat $cfgpath/config.cfg
 update_time_sec=$(bashio::config 'update_time_sec')
 watch -n $update_time_sec python3 $cfgpath/InverterData.py
