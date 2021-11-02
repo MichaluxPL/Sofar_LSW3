@@ -3,10 +3,9 @@ set -e
 
 echo Sofar Integration in run!
 cfgpath=./Sofar_LSW3
-[ ! -d $cfgpath ] && (echo "No repo in DockerImage -cloning marm..."; rm -Rf $cfgpath; git clone http://nas.marm:30000/MARM.pl/Sofar_LSW3.marm.git  $cfgpath;)
+[ ! -d $cfgpath ] && (echo "No repo in DockerImage -cloning marm..."; rm -Rf $cfgpath; git clone https://github.com/rysiulg/Sofar_LSW3.git  $cfgpath;)
 #[ ! -d $cfgpath ] && (echo "No repo in DockerImage -cloning github..."; rm -Rf $cfgpath; git clone https://github.com/MichaluxPL/Sofar_LSW3.git  $cfgpath;)
 ls -la 
-#ping 10.48.18.10 -c 4
 prometheus=$(bashio::config 'prometheus')
 [ "$prometheus" = "true" ] && prometheus="1" || prometheus="0"
 influxdb=$(bashio::config 'influxdb')
@@ -48,5 +47,5 @@ echo "mqtt_ssl=$mqtt_ssl" >>$cfgpath/config.cfg
 #cat $cfgpath/config.cfg
 update_time_sec=$(bashio::config 'update_time_sec')
 watch -n $update_time_sec python3 $cfgpath/InverterData.py
-#python3 -m http.server 8000
+
 
