@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 # Script gathering solar data from Sofar Solar Inverter (K-TLX) via logger module LSW-3/LSE
 # by Michalux (based on DEYE script by jlopez77)
+# Version: 1.5
+#
 
 import sys
 import socket
@@ -53,6 +55,16 @@ reg_start1=(int(configParser.get('SofarInverter', 'register_start1'),0))
 reg_end1=(int(configParser.get('SofarInverter', 'register_end1'),0))
 reg_start2=(int(configParser.get('SofarInverter', 'register_start2'),0))
 reg_end2=(int(configParser.get('SofarInverter', 'register_end2'),0))
+mqtt=int(configParser.get('MQTT', 'mqtt'))
+mqtt_server=configParser.get('MQTT', 'mqtt_server')
+mqtt_port=int(configParser.get('MQTT', 'mqtt_port'))
+mqtt_topic=configParser.get('MQTT', 'mqtt_topic')
+mqtt_username=configParser.get('MQTT', 'mqtt_username')
+mqtt_passwd=configParser.get('MQTT', 'mqtt_passwd')
+mqtt_tls=configParser.get('MQTT', 'mqtt_tls')
+mqtt_tls_insecure=configParser.get('MQTT', 'mqtt_tls_insecure')
+mqtt_tls_ver=int(configParser.get('MQTT', 'mqtt_tls_version'))
+mqtt_cacert=configParser.get('MQTT', 'mqtt_cacert')
 lang=configParser.get('SofarInverter', 'lang')
 verbose=configParser.get('SofarInverter', 'verbose')
 prometheus=configParser.get('Prometheus', 'prometheus')
@@ -63,13 +75,6 @@ ifport=configParser.get('InfluxDB', 'influxdb_port')
 ifuser=configParser.get('InfluxDB', 'influxdb_user')
 ifpass=configParser.get('InfluxDB', 'influxdb_password')
 ifdb=configParser.get('InfluxDB', 'influxdb_dbname')
-mqtt=int(configParser.get('MQTT', 'mqtt'))
-mqtt_server=configParser.get('MQTT', 'mqtt_server')
-mqtt_port=int(configParser.get('MQTT', 'mqtt_port'))
-mqtt_topic=configParser.get('MQTT', 'mqtt_topic')
-mqtt_username=configParser.get('MQTT', 'mqtt_username')
-mqtt_passwd=configParser.get('MQTT', 'mqtt_passwd')
-mqtt_ssl=configParser.get('MQTT', 'mqtt_ssl')
 # END CONFIG
 
 timestamp=str(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
@@ -236,16 +241,19 @@ if influxdb=="1" and invstatus==1:
 
 # MQTT integration
 if mqtt==1 and invstatus==1:
- # Initialise MQTT if configured
- client=paho.Client("inverter")
- if mqtt_username!="":
-  client.username_pw_set(username=mqtt_username, password=mqtt_passwd)
- if mqtt_ssl==1:
-  client.tls_set()  # <--- even without arguments
- client.connect(mqtt_server, mqtt_port)
- client.publish(mqtt_topic+"/attributes",output)
- client.publish(mqtt_topic,totalpower)
- print("Data has been sent to MQTT")
-else:
- jsonoutput=json.loads(output)
- print(json.dumps(jsonoutput, indent=4, sort_keys=False, ensure_ascii=False))
+    # Initialise MQTT if configured
+    client=paho.Client("inverter")
+    if mqtt_tls=="1":
+        client.tls_set(mqtt_cacert,tls_version=mqtt_tls_ver)
+        client.tls_insecure_set(mqtt_tls_insecure)
+    client.username_pw_set(username=mqtt_username, password=mqtt_passwd)
+    client.connect(mqtt_server, mqtt_port)
+    result=client.publish(mqtt_topic+"/attributes",output)
+    if result[0]==0:
+        print("Data has been succesfully published to MQTT with topic: "+mqtt_topic+"/attributes")
+    else:
+        print("Error publishing data to MQTT")
+    client.disconnect()
+print("JSON output:")
+jsonoutput=json.loads(output)
+print(json.dumps(jsonoutput, indent=4, sort_keys=False, ensure_ascii=False))

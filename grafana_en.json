@@ -326,7 +326,7 @@
               "mode": "none"
             },
             "thresholdsStyle": {
-              "mode": "off"
+              "mode": "area"
             }
           },
           "mappings": [],
@@ -334,12 +334,12 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "transparent",
                 "value": null
               },
               {
                 "color": "red",
-                "value": 80
+                "value": 253
               }
             ]
           },
@@ -508,7 +508,7 @@
       "targets": [
         {
           "exemplar": false,
-          "expr": "delta(SolarProduction_watts_total{Production=\"Today\"}[30m])",
+          "expr": "increase(SolarProduction_watts_total{Production=\"Today\"}[30m])",
           "format": "time_series",
           "instant": false,
           "interval": "30m",

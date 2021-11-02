@@ -39,12 +39,16 @@ influxdb_password=              # User password
 influxdb_dbname=                # Database name 
 
 [MQTT]
-mqtt=1                          # set to 1 for MQTT output, 0 for JSON output.
-mqtt_server=192.168.X.X
-mqtt_port=1883
-mqtt_topic=XXXXXXXXXXXX
-mqtt_username=
-mqtt_passwd=
+mqtt=0                          # 0: disabled, 1: enabled
+mqtt_server=                    # MQTT server IP address
+mqtt_port=1883                  # MQTT server tcp port
+mqtt_topic=                     # MQTT topic name
+mqtt_username=                  # MQTT access username
+mqtt_passwd=                    # MQTT user password
+mqtt_tls=0                      # Set to 1 to enable TLS support
+mqtt_tls_insecure=True          # Set to False to enable strict server's certificate hostname matching
+mqtt_tls_version=2              # 1 or 2
+mqtt_cacert=                    # CA certificate path/filename
 
 Files SOFARMap.xml and SOFARHWMap.xml contain MODBUS inverter's registers mapping for Sofar Solar K-TLX product line
 and Prometheus/InfluxDB metrics configuration.
@@ -140,20 +144,18 @@ bash:/python3 /InverterHWData.py (or ./InverterHWData.py)
 ```
 
 # Known Issues
-MQTT support reported to be broken :(
+You tell me :)
 
 # Contrib
 Feel free to suggest :)
 If You want to rewrite or/add change anything - please fork Your own project.
 
-# Home Assistant support (by jlopez77)
-MQTT support into Home Assistant (there are reports it is broken :( )
+# MQTT Support
 ```
-  - platform: mqtt
-    name: "SofarInverter"
-    state_topic: "mqtt_topic"
-    unit_of_measurement: "W"
-    json_attributes_topic: "mqtt_topic/attributes"
+    1. JSON_attributes_topic: "mqtt_topic/attributes"
+    2. For TLS support You'll need at least CA Certificate and TLS enabled MQTT
+       To enable TLS for Mosquitto look i.e here: http://www.steves-internet-guide.com/mosquitto-tls/
+    3. Tested with Mosquitto MQTT server (both with and without TLS)
 ```
 # Prometheus+Grafana support
 ```

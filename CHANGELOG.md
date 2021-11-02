@@ -93,3 +93,16 @@ A few additions and changes.
 1. config.cfg format has slightly changed
 
 ### Fixed
+
+## [1.5] - 2021-11-02
+MQTT support refactored and fixed
+
+### Added
+1. New parameters in config.cfg for MQTT integration
+2. MQTT TLS support
+
+### Changed
+1. Always output data in JSON format (no matter if MQTT is enabled or not)
+
+### Fixed
+MQTT support (tested with Mosquitto)
