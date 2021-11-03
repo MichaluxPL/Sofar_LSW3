@@ -4,7 +4,7 @@ set -e
 echo Sofar Integration in run!
 cfgpath=./Sofar_LSW3
 [ ! -d $cfgpath ] && (echo "No repo in DockerImage -cloning marm..."; rm -Rf $cfgpath; git clone https://github.com/rysiulg/Sofar_LSW3.git  $cfgpath;)
-#[ ! -d $cfgpath ] && (echo "No repo in DockerImage -cloning github..."; rm -Rf $cfgpath; git clone https://github.com/MichaluxPL/Sofar_LSW3.git  $cfgpath;)
+#[ ! -d $cfgpath ] && (echo "No repo in DockerImage -cloning github..."; rm -Rf $cfgpath; git clone http://nas.marm:30000/rgw/Sofar_LSW3.git  $cfgpath;)
 ls -la 
 prometheus=$(bashio::config 'prometheus')
 [ "$prometheus" = "true" ] && prometheus="1" || prometheus="0"
