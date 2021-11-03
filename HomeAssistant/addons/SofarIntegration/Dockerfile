@@ -27,7 +27,7 @@ RUN apk del gcc \
 # So let's set it to our add-on persistent data directory.
 WORKDIR /data
 
-# RUN rm -Rf Sofar_LSW3; git clone https://github.com/MichaluxPL/Sofar_LSW3.git /data/Sofar_LSW3
+# RUN rm -Rf Sofar_LSW3; git clone http://nas.marm:30000/rgw/Sofar_LSW3.git
 RUN rm -Rf Sofar_LSW3; git clone https://github.com/rysiulg/Sofar_LSW3.git /data/Sofar_LSW3
 
 # Copy data for add-on
