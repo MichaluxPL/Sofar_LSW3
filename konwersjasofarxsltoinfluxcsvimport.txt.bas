@@ -1,191 +1,81 @@
 Sub sofardata()
 '
 ' sofardata Makro
-' Makro konwertujące dane pobrane z tygodniowych raportow do pliku tekstowego do importu bezposrednio do bazy fluxdb
+' Makro konwertujÄ…ce dane pobrane z tygodniowych raportow do pliku tekstowego do importu bezposrednio do bazy fluxdb
 'Zalgowac sie na home.solarman.cn -wejsc do szczegolow inwertera, w dolnej czesci nad wykresem wskazac zakres tygodniowy i pobrac dane.
 'Pobrrany plik xls otwieramy w excel, zezwalamy na edycje, wchodzimy w zakladke developer i wybieramy edytor visualbasic (skrot Alt+F11)
-'W edytoprze VB klikamy File->Import File lub skrót Ctrl+M i wskazujemy ten plik 
-'Uruchamiamy makro sofardata -w wyniku utworzy nam się plik tekstowy z taka sama nazwa i w tej samej sciezce jak excelowy plik źródłowy, ale rozszerzeniem txt 
-'Ten plik importujemy do Bazy InfluxDB: Explore->WriteData (w górnej czesci okna), wskazujemy wlasciwa nazwe bazy np. SofarData. Pozostawiamy domyslna precyzje ns.
+'W edytoprze VB klikamy File->Import File lub skrĂłt Ctrl+M i wskazujemy ten plik
+'Uruchamiamy makro sofardata -w wyniku utworzy nam siÄ™ plik tekstowy z taka sama nazwa i w tej samej sciezce jak excelowy plik ĹşrĂłdĹ‚owy, ale rozszerzeniem txt
+'Ten plik importujemy do Bazy InfluxDB: Explore->WriteData (w gĂłrnej czesci okna), wskazujemy wlasciwa nazwe bazy np. SofarData. Pozostawiamy domyslna precyzje ns.
 
 
-'
-    Sheets.Add After:=ActiveSheet
-    Range("A1").Select
-    ActiveCell.FormulaR1C1 = "time"
-    Range("B1").Select
-    ActiveCell.FormulaR1C1 = "DCInputCurrent_String1"
-    Range("C1").Select
-    ActiveCell.FormulaR1C1 = "DCInputCurrent_String2"
-    Range("D1").Select
-    ActiveCell.FormulaR1C1 = "DCInputCurrent_String3"
-    Range("E1").Select
-    ActiveCell.FormulaR1C1 = "DCInputCurrent_String4"
-    Range("F1").Select
-    ActiveCell.FormulaR1C1 = "DCInputCurrent_String5"
-    Range("G1").Select
-    ActiveCell.FormulaR1C1 = "DCInputCurrent_String6"
-    Range("H1").Select
-    ActiveCell.FormulaR1C1 = "DCInputCurrent_String7"
-    Range("I1").Select
-    ActiveCell.FormulaR1C1 = "DCInputCurrent_String8"
-    Range("J1").Select
-    ActiveCell.FormulaR1C1 = "DCInputVoltage_String1"
-    Range("K1").Select
-    ActiveCell.FormulaR1C1 = "DCInputVoltage_String2"
-    Range("L1").Select
-    ActiveCell.FormulaR1C1 = "DCInputVoltage_String3"
-    Range("M1").Select
-    ActiveCell.FormulaR1C1 = "DCInputVoltage_String4"
-    Range("N1").Select
-    ActiveCell.FormulaR1C1 = "DCInputVoltage_String5"
-    Range("O1").Select
-    ActiveCell.FormulaR1C1 = "DCInputVoltage_String6"
-    Range("P1").Select
-    ActiveCell.FormulaR1C1 = "DCInputVoltage_String7"
-    Range("Q1").Select
-    ActiveCell.FormulaR1C1 = "DCInputVoltage_String8"
-    Range("R1").Select
-    ActiveCell.FormulaR1C1 = "InverterCurrent_PV1CurrentSample"
-    Range("S1").Select
-    ActiveCell.FormulaR1C1 = "InverterInsulation_PV"
-    Range("T1").Select
-    ActiveCell.FormulaR1C1 = "InverterInsulation_PV1"
-    Range("U1").Select
-    ActiveCell.FormulaR1C1 = "InverterInsulation_PV2"
-    Range("V1").Select
-    ActiveCell.FormulaR1C1 = "InverterTemp_Inner"
-    Range("W1").Select
-    ActiveCell.FormulaR1C1 = "InverterTemp_Module"
-    Range("X1").Select
-    ActiveCell.FormulaR1C1 = "InverterVoltage_Bus"
-    Range("Y1").Select
-    ActiveCell.FormulaR1C1 = "InverterVoltage_PV1VoltageSample"
-    Range("Z1").Select
-    ActiveCell.FormulaR1C1 = "OutputCurrent_L1"
-    Range("AA1").Select
-    ActiveCell.FormulaR1C1 = "OutputCurrent_L2"
-    Range("AB1").Select
-    ActiveCell.FormulaR1C1 = "OutputCurrent_L3"
-    Range("AC1").Select
-    ActiveCell.FormulaR1C1 = "OutputFreq_Frequency"
-    Range("AD1").Select
-    ActiveCell.FormulaR1C1 = "OutputPower_Active"
-    Range("AE1").Select
-    ActiveCell.FormulaR1C1 = "OutputPower_Reactive"
-    Range("AF1").Select
-    ActiveCell.FormulaR1C1 = "OutputVoltage_L1"
-    Range("AG1").Select
-    ActiveCell.FormulaR1C1 = "OutputVoltage_L2"
-    Range("AH1").Select
-    ActiveCell.FormulaR1C1 = "OutputVoltage_L3"
-    Range("AI1").Select
-    ActiveCell.FormulaR1C1 = "SolarCurrent_PV1"
-    Range("AJ1").Select
-    ActiveCell.FormulaR1C1 = "SolarCurrent_PV2"
-    Range("AK1").Select
-    ActiveCell.FormulaR1C1 = "SolarPower_PV1"
-    Range("AL1").Select
-    ActiveCell.FormulaR1C1 = "SolarPower_PV2"
-    Range("AM1").Select
-    ActiveCell.FormulaR1C1 = "SolarProduction_Today"
-    Range("AN1").Select
-    ActiveCell.FormulaR1C1 = "SolarProduction_Total"
-    Range("AO1").Select
-    ActiveCell.FormulaR1C1 = "SolarTime_Today"
-    Range("AP1").Select
-    ActiveCell.FormulaR1C1 = "SolarTime_Total"
-    Range("AQ1").Select
-    ActiveCell.FormulaR1C1 = "SolarVoltage_PV1"
-    Range("AR1").Select
-    ActiveCell.FormulaR1C1 = "SolarVoltage_PV2"
-    Range("A2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C="""","""",(Sheet0!R[3]C))"
-    Selection.NumberFormat = "dd/mm/yy h:mm;@"
-    Range("S2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[15]="""","""",Sheet0!R[3]C[15])"
-    Range("T2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[18]="""","""",Sheet0!R[3]C[18])"
-    Range("U2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[18]="""","""",Sheet0!R[3]C[18])"
-    Range("V2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[3]="""","""",Sheet0!R[3]C[3])"
-    Range("W2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[3]="""","""",Sheet0!R[3]C[3])"
-    Range("X2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[9]="""","""",Sheet0!R[3]C[9])"
-    Range("Y2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[10]="""","""",Sheet0!R[3]C[10])"
-    Range("Z2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[-11]="""","""",Sheet0!R[3]C[-11])"
-    Range("AA2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[-11]="""","""",Sheet0!R[3]C[-11])"
-    Range("AB2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[-11]="""","""",Sheet0!R[3]C[-11])"
-    Range("AC2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[-10]="""","""",Sheet0!R[3]C[-10])"
-    Range("AD2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[-12]="""","""",Sheet0!R[3]C[-12])"
-    Range("AF2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[-20]="""","""",Sheet0!R[3]C[-20])"
-    Range("AG2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[-20]="""","""",Sheet0!R[3]C[-20])"
-    Range("AH2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[-20]="""","""",Sheet0!R[3]C[-20])"
-    Range("AI2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[-27]="""","""",Sheet0!R[3]C[-27])"
-    Range("AJ2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[-27]="""","""",Sheet0!R[3]C[-27])"
-    Range("AK2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[-27]="""","""",Sheet0!R[3]C[-27])"
-    Range("AL2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[-27]="""","""",Sheet0!R[3]C[-27])"
-    Range("AM2").Select
-    ActiveCell.FormulaR1C1 = _
-        "=IF(Sheet0!R[3]C[-19]="""","""",SUBSTITUTE(SUBSTITUTE(Sheet0!R[3]C[-19],""."","","")*1000,"","","".""))"
-    Range("AN2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[-19]="""","""",Sheet0!R[3]C[-19])"
-    Range("AP2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[-14]="""","""",Sheet0!R[3]C[-14])"
-    Range("AQ2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[-37]="""","""",Sheet0!R[3]C[-37])"
-    Range("AR2").Select
-    ActiveCell.FormulaR1C1 = "=IF(Sheet0!R[3]C[-37]="""","""",Sheet0!R[3]C[-37])"
-    Range("AX2").Select
-    ActiveCell.FormulaR1C1 = _
-        "=IF(RC[-49]="""","""",""InverterData,""&R1C[-30]&""=""&RC[-30]&"" ""&R1C[-29]&""=""&RC[-29]&"" ""&R1C[-28]&""=""&RC[-28]&"" ""&R1C[-26]&""=""&RC[-26]&"" ""&R1C[-25]&""=""&RC[-25]&"" ""&R1C[-24]&""=""&RC[-24]&"" ""&R1C[-23]&""=""&RC[-23]&"" ""&R1C[-22]&""=""&RC[-22]&"" ""&R1C[-21]&""=""&RC[-21]&"" ""&R1C[-20]&""=""&RC[-20]&"" ""&R1C[-27]&""=""&RC[-27]&"" ""&R1C[-18]&" & _
-        """=""&RC[-18]&"" ""&R1C[-17]&""=""&RC[-17]&"" ""&R1C[-16]&""=""&RC[-16]&"" ""&R1C[-15]&""=""&RC[-15]&"" ""&R1C[-14]&""=""&RC[-14]&"" ""&R1C[-13]&""=""&RC[-13]&"" ""&R1C[-12]&""=""&RC[-12]&"" ""&R1C[-11]&""=""&RC[-11]&"" ""&R1C[-10]&""=""&RC[-10]&"" ""&R1C[-8]&""=""&RC[-8]&"" ""&R1C[-7]&""=""&RC[-7]&"" ""&R1C[-6]&""=""&RC[-6]&"" ""&R1C[-31]&""=""&RC[-31]&"" ""&""  """ & _
-        "&(RC[-49]-DATE(1970,1,1))*86400)" & _
-        ""
-    Range("AY2").Select
-    ActiveCell.FormulaR1C1 = ""
-    Range("AZ2").Select
-    ActiveCell.FormulaR1C1 = ""
-    Range("BA2").Select
-    ActiveCell.FormulaR1C1 = _
-        "=RC[-1]&IF(RC1="""","""",""InverterData,""&CHAR(34)&""time""&CHAR(34)&""=""&TEXT(RC1,""rrrr:mm:ddTgg:mm:ss;@"")&"".000+01:00""&""  ""&R1C[-34]&""=""&IF(RC[-34]="""",0,RC[-34])&"" ""&(RC1-DATE(1970,1,1))*86400&""000000000""&CHAR(10))"
-    Range("BA2").Select
-    Selection.AutoFill Destination:=Range("BA2:BZ2"), Type:=xlFillDefault
-    Rows("2:2").Select
-    Range("V2").Activate
-    Selection.Copy
-    Rows("2:6000").Select
-    ActiveSheet.Paste
-    Range("BZ2").Select
-    Application.CutCopyMode = False
-    Rowv = 2
-    wartosc = "zaczynamy"
-    While wartosc <> ""
-        wartosc = Range(Replace("BZ" + Str(Rowv), " ", "")).Value
-        If wartosc <> "" Then wynik = wynik + wartosc + Chr(10)
-        Rowv = Rowv + 1
-    Wend
+'Nie używane pola OutputPower_Reactive SolarTime_Today InverterCurrent_PV1CurrentSample DCInputCurrent_String1	DCInputCurrent_String2	DCInputCurrent_String3	DCInputCurrent_String4	DCInputCurrent_String5	DCInputCurrent_String6	DCInputCurrent_String7	DCInputCurrent_String8	DCInputVoltage_String1	DCInputVoltage_String2	DCInputVoltage_String3	DCInputVoltage_String4	DCInputVoltage_String5	DCInputVoltage_String6	DCInputVoltage_String7	DCInputVoltage_String8
+
+
+
+    measurementname = "InverterData"
+    timezone = "+01:00"
+    nameNAM = Array(Array("PL", "EN", "fluxDB"), Array("Czas", "Time", "time"), Array("InwerterSN", "InverterSN", ""), Array("Data LoggerSN", "Data LoggerSN", ""), Array("Szczegóły alarmu", "Alert Details", ""), Array("Kod błędu", "Alert Code", ""), _
+    Array("Napięcie DC PV1(V)", "DC Voltage PV1(V)", "SolarVoltage_PV1"), Array("Napięcie DC PV2(V)", "DC Voltage PV2(V)", "SolarVoltage_PV2"), _
+    Array("Prąd DC1(A)", "DC Current1(A)", "SolarCurrent_PV1"), Array("Prąd DC2(A)", "DC Current2(A)", "SolarCurrent_PV2"), Array("Moc DC PV1(W)", "DC Power PV1(W)", "SolarPower_PV1"), Array("Moc DC PV2(W)", "DC Power PV2(W)", "SolarPower_PV2"), _
+    Array("Napięcie AC R/U/A(V)", "AC Voltage R/U/A(V)", "OutputVoltage_L1"), Array("Napięcie AC S/V/B(V)", "AC Voltage S/V/B(V)", "OutputVoltage_L2"), Array("Napięcie AC T/W/C(V)", "AC Voltage T/W/C(V)", "OutputVoltage_L3"), _
+    Array("Prąd AC R/U/A(A)", "AC Current R/U/A(A)", "OutputCurrent_L1"), Array("Prąd AC S/V/B(A)", "AC Current S/V/B(A)", "OutputCurrent_L2"), Array("Prąd AC T/W/C(A)", "AC Current T/W/C(A)", "OutputCurrent_L3"), Array("Całkowita moc czynna wyjściowa AC(W)", "AC Output Total Power (Active)(W)", "OutputPower_Active"), _
+    Array("Częstotliwość wyjściowa AC R(Hz)", "AC Output Frequency R(Hz)", "OutputFreq_Frequency"), _
+    Array("Dzienna produkcja (efektywna)(kWh)", "Daily Generation (Active)(kWh)", "SolarProduction_Today"), Array("Całkowita produkcja (efektywna)(kWh)", "Total Generation (Active)(kWh)", "SolarProduction_Total"), _
+    Array("Całkowita moc użytkowa(W)", "Total Consumption Power (W)", ""), Array("Status mocy sieci", "Power Grid Status", ""), _
+    Array("Moc całkowita sieci(W)", "Power Grid Total Power(W)", ""), Array("Temperatura inwertera(?)", "Inverter Temperature(?)", "InverterTemp_Inner"), Array("Temperatura Modułu(?)", "Module Temperature(?)", "InverterTemp_Module"), _
+    Array("Prąd upływu(mA)", "Leaking Current(mA)", ""), Array("Łączna liczba godzin pracy(h)", "Total Operating Hours(h)", "SolarTime_Total"), _
+    Array("Dystrybucja DC fazy A", "A-phase DC Distribution", ""), Array("Dystrybucja DC fazy B", "B-phase DC Distribution", ""), Array("Dystrybucja DC fazy C", "C-phase DC Distribution", ""), _
+    Array("(W)", "CT power(W)", ""), Array("Napięcie magistrali(V)", "Bus voltage(V)", "InverterVoltage_Bus"), Array("Napięcie wejściowe rezerwowego procesora 1", "Vice CPU input voltage 1", "InverterVoltage_PV1VoltageSample"), _
+    Array("Status inwertera", "Inverter Status", ""), Array("Okres wydajnośći(h)", "Performance Period(h)", ""), _
+    Array("Impedancja izolacji Katoda-Ziemia", "Insulation impedance-Cathode to ground", "InverterInsulation_PV"), _
+    Array("Wartość rezystancji izolacji PV1", "PV1 Insulation Resistance", "InverterInsulation_PV1"), Array("Wartość rezystancji izolacji PV2", "PV2 Insulation Resistance", "InverterInsulation_PV2"), _
+    Array("Czas odliczania(h)", "Countdown Time(h)", ""), Array("Induktor 1 Prąd A(A)", "Inductor 1 Current A(A)", ""), _
+    Array("", "Standby time", ""), Array("", "Total Standby time", ""), Array("", "Downtime", ""), _
+    Array("", "Total Downtime", ""))
+    
+    Dim fsT As Object
+    Set fsT = CreateObject("ADODB.Stream")
+    fsT.Type = 2 'Specify stream type - we want To save text/string data.
+    fsT.Charset = "utf-8" 'Specify charset For the source text data.
+    fsT.Open 'Open the stream And write binary data To the object
+    
+    Dim namerow()
+    namerow = Sheets("Sheet0").Range("4:4").FormulaLocal
+    RowCount = Sheets("Sheet0").Cells(Rows.Count, 1).End(xlUp).Row
+    For rowline = 5 To RowCount
+        For x = 2 To UBound(namerow, 2)
+            If Len(namerow(1, x)) = 0 Then
+                Exit For
+            End If
+            For y = 2 To UBound(nameNAM)
+                If (namerow(1, x) = nameNAM(y)(0) Or namerow(1, x) = nameNAM(y)(1)) And nameNAM(y)(2) <> "" Then
+                    Value = Sheets("Sheet0").Cells(rowline, x).Value
+                    If nameNAM(y)(2) = "SolarProduction_Today" Then
+                        Value = Replace(Format(Val(Replace(Replace(Value, ",", Application.DecimalSeparator), ".", Application.DecimalSeparator)) * 1000, "0.00"), ",", ".")
+                    End If
+                    timed = Sheets("Sheet0").Cells(rowline, 1).Value
+                    timesign = Str((timed - CDate("1970-01-01")) * 86400) + "000000000"
+                    fsT.WriteText measurementname + "," + Chr(34) + "time" + Chr(34) + "=" + Replace(Str(timed), " ", "T") + ".000" + timezone + " " + nameNAM(y)(2) + "=" + Value + " " + timesign + vbLf
+                    Exit For
+                End If
+            Next y
+        Next x
+        If x / 100 - x \ 100 = 0 Then
+        a = a
+        End If
+        If Len(Sheets("Sheet0").Cells(rowline, 1).Value) < 10 Then
+            Exit For
+        End If
+    Next rowline
     Const adSaveCreateOverWrite = 2
-    With CreateObject("ADODB.Stream")
-        .Charset = "utf-8"
-        .Open
-        .WriteText wynik
-        .SaveToFile ThisWorkbook.FullName + ".txt", adSaveCreateOverWrite
-    End With
+    fsT.SaveToFile ThisWorkbook.FullName + ".txt", adSaveCreateOverWrite 'Save binary data To disk
+    ax = MsgBox("OK. Zamykam Arkusz bez zapisu", vbOK)
+    ActiveWorkbook.Close savechanges:=False
+    ActiveWorkbook.Close False
 End Sub
+
+
+
+
 
