@@ -1,4 +1,4 @@
-# SOFAR Inverter + LSW-3
+# SOFAR Inverter + LSW-3/LSE
 Small utility to read data from SOFAR K-TLX inverters through the Solarman (LSW-3/LSE) datalogger. 
 Two scripts to get inverter's statistics and hardware info.
 Tested with logger S/N 17xxxxxxx and 21xxxxxxx (protocol V5).
@@ -50,6 +50,9 @@ mqtt_tls_insecure=True          # Set to False to enable strict server's certifi
 mqtt_tls_version=2              # 1 or 2
 mqtt_cacert=                    # CA certificate path/filename
 
+[Domoticz]
+domoticz_support=0              # 0: disabled, 1: enabled
+
 Files SOFARMap.xml and SOFARHWMap.xml contain MODBUS inverter's registers mapping for Sofar Solar K-TLX product line
 and Prometheus/InfluxDB metrics configuration.
 Edit i.e. to get captions in a different language, change Prometheus/InfluxDB metrics names or
@@ -61,7 +64,7 @@ Example SOFARMap.xml structure and fields definition (similar for SOFARHWMap.xml
         "titleEN": "PV1 Power",     # English JSON output name 
         "titlePL": "Moc PV1",       # Polish JSON output name
         "registers": ["0x000A"],    # Inverter's register address (must be in range configured in the config file)
-        "parserRule": 1,            # Currently unused
+        "DomoticzIdx": 0,           # Domoticz virtual device idx number (for Domoticz support)
         "optionRanges": [],         # For numeric value to text label mappings
         "ratio": 10,                # Value ratio (will be used to multiply response value)
         "unit": "W",                # Value unit
@@ -150,12 +153,19 @@ You tell me :)
 Feel free to suggest :)
 If You want to rewrite or/add change anything - please fork Your own project.
 
-# MQTT Support
+# MQTT Support (Domoticz compatible)
 ```
-    1. JSON_attributes_topic: "mqtt_topic/attributes"
+    1. JSON_attributes_topic (unless Domoticz support enabled !): "mqtt_topic/attributes"
     2. For TLS support You'll need at least CA Certificate and TLS enabled MQTT
        To enable TLS for Mosquitto look i.e here: http://www.steves-internet-guide.com/mosquitto-tls/
-    3. Tested with Mosquitto MQTT server (both with and without TLS)
+    3. To turn Domoticz support on:
+       a) enable it in config.cfg
+       b) set mqtt_topic=domoticz/in in config.cfg
+       c) create virtual devices in Domoticz (write down their idx numbers)
+       d) in SOFARMap.xml find corresponding variables and for each input idx number
+       e) leave "DomoticzIdx":0 for variables You don't want to send data to Domoticz
+       WARNING: When enabled, Domoticz support disables normal MQTT message delivery (all values in one message).
+    3. Tested with Mosquitto MQTT server (both with and without TLS) and Domoticz 2021.1
 ```
 # Prometheus+Grafana support
 ```

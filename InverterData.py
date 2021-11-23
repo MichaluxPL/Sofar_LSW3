@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # Script gathering solar data from Sofar Solar Inverter (K-TLX) via logger module LSW-3/LSE
 # by Michalux (based on DEYE script by jlopez77)
-# Version: 1.5
+# Version: 1.6
 #
 
 import sys
@@ -41,6 +41,10 @@ def PrepareInfluxData(IfData, fieldname, fieldvalue):
 def Write2InfluxDB(IfData):
     ifclient.write_points(IfData);
 
+def PrepareDomoticzData(DData, idx, svalue):
+   DData.append('{ "idx": '+str(idx)+', "svalue": "'+str(svalue)+'" }')
+   return DData
+
 os.chdir(os.path.dirname(sys.argv[0]))
 
 # CONFIG
@@ -75,6 +79,7 @@ ifport=configParser.get('InfluxDB', 'influxdb_port')
 ifuser=configParser.get('InfluxDB', 'influxdb_user')
 ifpass=configParser.get('InfluxDB', 'influxdb_password')
 ifdb=configParser.get('InfluxDB', 'influxdb_dbname')
+DomoticzSupport=configParser.get('Domoticz', 'domoticz_support')
 # END CONFIG
 
 timestamp=str(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
@@ -98,9 +103,10 @@ chunks=0
 totalpower=0
 totaltime=0
 PMData=[]
+DomoticzData=[]
 
 while chunks<2:
- if verbose=="1": print("Chunk no: ", chunks);
+ if verbose=="1": print("*** Chunk no: ", chunks);
 
 # Data frame begin
  start = binascii.unhexlify('A5') #start
@@ -144,17 +150,17 @@ while chunks<2:
 
  ok=False;
  while (not ok):
-  try:
-   data = clientSocket.recv(1024);
-   ok=True
-   try:
-    data
-   except:
-    print("No data - Exit")
-    sys.exit(1) #Exit, no data
-  except socket.timeout as msg:
-   print("Connection timeout - inverter and/or gateway is off");
-   sys.exit(1) #Exit
+    try:
+        data = clientSocket.recv(1024);
+        ok=True
+        try:
+            data
+        except:
+            print("No data - Exit")
+            sys.exit(1) #Exit, no data
+    except socket.timeout as msg:
+        print("Connection timeout - inverter and/or gateway is off");
+        sys.exit(1) #Exit
 
 # PARSE RESPONSE (start position 56, end position 60)
  if verbose=="1": print("Received data: ", data);
@@ -180,6 +186,7 @@ while chunks<2:
      label_name=item["label_name"]
      label_value=item["label_value"]
      metric_type=item["metric_type"]
+     DomoticzIdx=item["DomoticzIdx"]
      for register in item["registers"]:
       if register==hexpos and chunks!=-1:
        response=round(response*ratio,2)
@@ -196,9 +203,9 @@ while chunks<2:
                 response='"'+option["valueEN"]+'"'
        if hexpos!='0x0015' and hexpos!='0x0016' and hexpos!='0x0017' and hexpos!='0x0018':
         if verbose=="1": print(hexpos+" - "+title+": "+str(response)+unit);
-        if prometheus=="1" and graph==1:
-         PMetrics(metric_name, metric_type, label_name, label_value, response)
+        if prometheus=="1" and graph==1: PMetrics(metric_name, metric_type, label_name, label_value, response);
         if influxdb=="1" and graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, response);
+        if DomoticzSupport=="1" and DomoticzIdx>0: PrepareDomoticzData(DomoticzData, DomoticzIdx, response);
         if unit!="":
             output=output+"\""+ title + " (" + unit + ")" + "\":" + str(response)+","
         else:
@@ -208,17 +215,17 @@ while chunks<2:
         totalpower+=response*ratio
         if verbose=="1": print(hexpos+" - "+title+": "+str(response*ratio)+unit);
         output=output+"\""+ title + " (" + unit + ")" + "\":" + str(totalpower)+","
-        if prometheus=="1" and graph==1:
-         PMetrics(metric_name, metric_type, label_name, label_value, (totalpower*1000))
+        if prometheus=="1" and graph==1: PMetrics(metric_name, metric_type, label_name, label_value, (totalpower*1000));
         if influxdb=="1" and graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, totalpower);
+        if DomoticzSupport=="1" and DomoticzIdx>0: PrepareDomoticzData(DomoticzData, DomoticzIdx, response);
        if hexpos=='0x0017': totaltime+=response*ratio*65536;
        if hexpos=='0x0018':
         totaltime+=response*ratio
         if verbose=="1": print(hexpos+" - "+title+": "+str(response*ratio)+unit);
         output=output+"\""+ title + " (" + unit + ")" + "\":" + str(totaltime)+","
-        if prometheus=="1" and graph==1:
-         PMetrics(metric_name, metric_type, label_name, label_value, totaltime)
+        if prometheus=="1" and graph==1: PMetrics(metric_name, metric_type, label_name, label_value, totaltime);
         if influxdb=="1" and graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, totaltime);
+        if DomoticzSupport=="1" and DomoticzIdx>0: PrepareDomoticzData(DomoticzData, DomoticzIdx, response);
   a+=1
  if chunks==0:
   pini=reg_start2
@@ -239,7 +246,7 @@ if influxdb=="1" and invstatus==1:
     Write2InfluxDB(InfluxData)
     if verbose=="1": print("Influx data: ",InfluxData);
 
-# MQTT integration
+# MQTT and Domoticz integration
 if mqtt==1 and invstatus==1:
     # Initialise MQTT if configured
     client=paho.Client("inverter")
@@ -248,12 +255,21 @@ if mqtt==1 and invstatus==1:
         client.tls_insecure_set(mqtt_tls_insecure)
     client.username_pw_set(username=mqtt_username, password=mqtt_passwd)
     client.connect(mqtt_server, mqtt_port)
-    result=client.publish(mqtt_topic+"/attributes",output)
-    if result[0]==0:
-        print("Data has been succesfully published to MQTT with topic: "+mqtt_topic+"/attributes")
+    # Send data to Domoticz if support enabled
+    if DomoticzSupport=="1":
+        if verbose=="1": print("*** MQTT messages for Domoticz:");
+        for mqtt_data in DomoticzData:
+            if verbose=="1": print(mqtt_topic, mqtt_data);
+            result=client.publish(mqtt_topic, mqtt_data)
+            if result[0]!=0:
+                print("Error publishing data for Domoticz to MQTT")
     else:
-        print("Error publishing data to MQTT")
+        result=client.publish(mqtt_topic+"/attributes",output)
+        if result[0]==0:
+            print("*** Data has been succesfully published to MQTT with topic: "+mqtt_topic+"/attributes")
+        else:
+            print("Error publishing data to MQTT")
     client.disconnect()
-print("JSON output:")
+print("*** JSON output:")
 jsonoutput=json.loads(output)
 print(json.dumps(jsonoutput, indent=4, sort_keys=False, ensure_ascii=False))
