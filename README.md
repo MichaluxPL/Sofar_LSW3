@@ -7,7 +7,7 @@ Requires python3 to run.
 REMARK: To make it work with other inverter brand/model connected via LSW-3/LSE you might need to alter
 the register's addresses in the .xml files accordingly and change register start/end numbers in config.cfg
 
-*Thanks to @jlopez77 https://github.com/jlopez77 for a big part of the code.*
+*Thanks to @jlopez77 https://github.com/jlopez77 for logger/MODBUS protocol code.*
 
 # Configuration
 

@@ -118,3 +118,13 @@ Domoticz MQTT support
 1. Removed unused parserRule parameter from SOFARMap.xml
 
 ### Fixed
+
+## [1.61] - 2021-11-23
+Fix version
+
+### Added
+
+### Changed
+
+### Fixed
+1. Small fix for duplicated quotes for string values in MQTT Domoticz messages.
