@@ -1,6 +1,6 @@
 {
   "name": "Sofar Integration",
-  "version": "1.5",
+  "version": "1.6",
   "slug": "sofar_integration",
   "description": "Integration with Sofar to get data from LSW3 on network! for MichaluxPL/Sofar_LSW3 github script and sample HA config https://github.com/pawelka/sofarsolar_esp_rs485_logger",
   "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
