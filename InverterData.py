@@ -207,7 +207,11 @@ while chunks<2:
         if verbose=="1": print(hexpos+" - "+title+": "+str(response)+unit);
         if prometheus=="1" and graph==1: PMetrics(metric_name, metric_type, label_name, label_value, response);
         if influxdb=="1" and graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, response);
-        if DomoticzSupport=="1" and DomoticzIdx>0: PrepareDomoticzData(DomoticzData, DomoticzIdx, response);
+        if DomoticzSupport=="1" and DomoticzIdx>0: 
+            if isinstance(response, str): 
+              PrepareDomoticzData(DomoticzData, DomoticzIdx, response.replace('"',""))
+            else:
+              PrepareDomoticzData(DomoticzData, DomoticzIdx, response)
         if unit!="":
             output=output+"\""+ title + " (" + unit + ")" + "\":" + str(response)+","
         else:
