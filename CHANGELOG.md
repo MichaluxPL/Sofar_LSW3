@@ -106,3 +106,25 @@ MQTT support refactored and fixed
 
 ### Fixed
 MQTT support (tested with Mosquitto)
+
+## [1.6] - 2021-11-23
+Domoticz MQTT support
+
+### Added
+1. New parameter in config.cfg to enable Domoticz MQTT support
+2. DomoticzIdx parameter in SOFARMAP.xml
+
+### Changed
+1. Removed unused parserRule parameter from SOFARMap.xml
+
+### Fixed
+
+## [1.61] - 2021-11-23
+Fix version
+
+### Added
+
+### Changed
+
+### Fixed
+1. Small fix for duplicated quotes for string values in MQTT Domoticz messages.
