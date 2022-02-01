@@ -9,6 +9,14 @@ the register's addresses in the .xml files accordingly and change register start
 
 *Thanks to @jlopez77 https://github.com/jlopez77 for logger/MODBUS protocol code.*
 
+```
+[Required python modules]
+To run, script requires following python modules:
+libscrc
+paho-mqtt
+influxdb
+```
+
 # Configuration
 
 Edit the config.cfg and enter the following data:
