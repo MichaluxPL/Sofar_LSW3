@@ -264,11 +264,12 @@ if mqtt==1 and invstatus==1:
         for mqtt_data in DomoticzData:
             if verbose=="1": print(mqtt_topic, mqtt_data);
             result=client.publish(mqtt_topic, mqtt_data)
-            if result[0]!=0:
+            result.wait_for_publish()
+            if result.rc!=0:
                 print("Error publishing data for Domoticz to MQTT")
     else:
         result=client.publish(mqtt_topic+"/attributes",output)
-        if result[0]==0:
+        if result.rc==0:
             print("*** Data has been succesfully published to MQTT with topic: "+mqtt_topic+"/attributes")
         else:
             print("Error publishing data to MQTT")
