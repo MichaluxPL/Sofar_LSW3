@@ -11,6 +11,7 @@ import re
 import libscrc
 import json
 import paho.mqtt.client as paho
+import paho.mqtt.publish as mqttpublish
 import os
 import configparser
 import datetime
@@ -43,12 +44,13 @@ def Write2InfluxDB(IfData):
 
 def PrepareDomoticzData(DData, idx, svalue):
     if isinstance(svalue, str):
-        DData.append('{ "idx": '+str(idx)+', "svalue": '+ svalue +' }')
+        DData.append({ "topic": mqtt_topic, "payload": '{ "idx": "'+str(idx)+'", "svalue": "'+ svalue +'" }', "retain": True })
     else:
-        DData.append('{ "idx": '+str(idx)+', "svalue": "'+ str(svalue) +'" }')
+        DData.append({ "topic": mqtt_topic, "payload": '{ "idx": "'+str(idx)+'", "svalue": "'+ str(svalue) +'" }', "retain": True })
     return DData
 
-os.chdir(os.path.dirname(sys.argv[0]))
+#os.chdir(os.path.dirname(sys.argv[0]))
+os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
 
 # CONFIG
 configParser = configparser.RawConfigParser()
@@ -251,29 +253,35 @@ if influxdb=="1" and invstatus==1:
 
 # MQTT and Domoticz integration
 if mqtt==1 and invstatus==1:
-    # Initialise MQTT if configured
-    client=paho.Client("inverter")
-    if mqtt_tls=="1":
-        client.tls_set(mqtt_cacert,tls_version=mqtt_tls_ver)
-        client.tls_insecure_set(mqtt_tls_insecure)
-    client.username_pw_set(username=mqtt_username, password=mqtt_passwd)
-    client.connect(mqtt_server, mqtt_port)
     # Send data to Domoticz if support enabled
     if DomoticzSupport=="1":
         if verbose=="1": print("*** MQTT messages for Domoticz:");
         for mqtt_data in DomoticzData:
-            if verbose=="1": print(mqtt_topic, mqtt_data);
-            result=client.publish(mqtt_topic, mqtt_data)
-            result.wait_for_publish()
-            if result.rc!=0:
-                print("Error publishing data for Domoticz to MQTT")
+            if verbose=="1": print(mqtt_data);
+        if mqtt_tls=="1":
+            try:
+                mqttpublish.multiple(DomoticzData, mqtt_server, mqtt_port, tls={"ca_certs":mqtt_cacert, "tls_version": mqtt_tls_ver}, client_id="inverter", auth={"username": mqtt_username, "password": mqtt_passwd})
+            except:
+                print("Error publishing data to MQTT")
+        else:
+            try:
+                mqttpublish.multiple(DomoticzData, mqtt_server, mqtt_port, client_id="inverter", auth={"username": mqtt_username, "password": mqtt_passwd})
+            except:
+                print("Error publishing data to MQTT")
     else:
+        # Initialise MQTT if configured
+        client=paho.Client("inverter")
+        if mqtt_tls=="1":
+            client.tls_set(mqtt_cacert,tls_version=mqtt_tls_ver)
+            client.tls_insecure_set(mqtt_tls_insecure)
+        client.username_pw_set(username=mqtt_username, password=mqtt_passwd)
+        client.connect(mqtt_server, mqtt_port)
         result=client.publish(mqtt_topic+"/attributes",output)
-        if result.rc==0:
+        if not result.is_published:
             print("*** Data has been succesfully published to MQTT with topic: "+mqtt_topic+"/attributes")
         else:
             print("Error publishing data to MQTT")
-    client.disconnect()
+        client.disconnect()
 print("*** JSON output:")
 jsonoutput=json.loads(output)
 print(json.dumps(jsonoutput, indent=4, sort_keys=False, ensure_ascii=False))
