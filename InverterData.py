@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # Script gathering solar data from Sofar Solar Inverter (K-TLX) via logger module LSW-3/LSE
 # by Michalux (based on DEYE script by jlopez77)
-# Version: 1.63
+# Version: 1.64
 #
 
 import sys
@@ -249,7 +249,7 @@ if prometheus=="1" and invstatus==1:
 # Write data to Influx DB
 if influxdb=="1" and invstatus==1:
     Write2InfluxDB(InfluxData)
-    if verbose=="1": print("Influx data: ",InfluxData);
+    if verbose=="1": print("Influx data: ", InfluxData);
 
 # MQTT and Domoticz integration
 if mqtt==1 and invstatus==1:
