@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # Script gathering solar data from Sofar Solar Inverter (K-TLX) via logger module LSW-3/LSE
 # by Michalux (based on DEYE script by jlopez77)
-# Version: 1.61
+# Version: 1.63
 #
 
 import sys
@@ -44,9 +44,9 @@ def Write2InfluxDB(IfData):
 
 def PrepareDomoticzData(DData, idx, svalue):
     if isinstance(svalue, str):
-        DData.append({ "topic": mqtt_topic, "payload": '{ "idx": "'+str(idx)+'", "svalue": "'+ svalue +'" }', "retain": True })
+        DData.append({ "topic": mqtt_topic, "payload": '{ "idx": '+str(idx)+', "svalue": "'+ svalue +'" }', "retain": True })
     else:
-        DData.append({ "topic": mqtt_topic, "payload": '{ "idx": "'+str(idx)+'", "svalue": "'+ str(svalue) +'" }', "retain": True })
+        DData.append({ "topic": mqtt_topic, "payload": '{ "idx": '+str(idx)+', "svalue": "'+ str(svalue) +'" }', "retain": True })
     return DData
 
 #os.chdir(os.path.dirname(sys.argv[0]))
@@ -255,12 +255,13 @@ if influxdb=="1" and invstatus==1:
 if mqtt==1 and invstatus==1:
     # Send data to Domoticz if support enabled
     if DomoticzSupport=="1":
-        if verbose=="1": print("*** MQTT messages for Domoticz:");
-        for mqtt_data in DomoticzData:
-            if verbose=="1": print(mqtt_data);
+        if verbose=="1":
+            print("*** MQTT messages for Domoticz:")
+            for mqtt_data in DomoticzData:
+                print(mqtt_data);
         if mqtt_tls=="1":
             try:
-                mqttpublish.multiple(DomoticzData, mqtt_server, mqtt_port, tls={"ca_certs":mqtt_cacert, "tls_version": mqtt_tls_ver}, client_id="inverter", auth={"username": mqtt_username, "password": mqtt_passwd})
+                mqttpublish.multiple(DomoticzData, mqtt_server, mqtt_port, tls={"ca_certs": mqtt_cacert, "tls_version": mqtt_tls_ver}, client_id="inverter", auth={"username": mqtt_username, "password": mqtt_passwd})
             except:
                 print("Error publishing data to MQTT")
         else:
@@ -269,15 +270,16 @@ if mqtt==1 and invstatus==1:
             except:
                 print("Error publishing data to MQTT")
     else:
-        # Initialise MQTT if configured
+        # Initialise MQTT
         client=paho.Client("inverter")
         if mqtt_tls=="1":
             client.tls_set(mqtt_cacert,tls_version=mqtt_tls_ver)
             client.tls_insecure_set(mqtt_tls_insecure)
         client.username_pw_set(username=mqtt_username, password=mqtt_passwd)
         client.connect(mqtt_server, mqtt_port)
-        result=client.publish(mqtt_topic+"/attributes",output)
-        if not result.is_published:
+        result=client.publish(mqtt_topic+"/attributes", output)
+        result.wait_for_publish()
+        if result.is_published:
             print("*** Data has been succesfully published to MQTT with topic: "+mqtt_topic+"/attributes")
         else:
             print("Error publishing data to MQTT")
