@@ -128,3 +128,13 @@ Fix version
 
 ### Fixed
 1. Small fix for duplicated quotes for string values in MQTT Domoticz messages.
+
+## [1.66] - 2022-02-22
+Fix version
+
+### Added
+
+### Changed
+
+### Fixed
+1. Reliable messages delivery to MQTT/Domoticz. 
