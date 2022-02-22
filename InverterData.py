@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # Script gathering solar data from Sofar Solar Inverter (K-TLX) via logger module LSW-3/LSE
 # by Michalux (based on DEYE script by jlopez77)
-# Version: 1.64
+# Version: 1.66
 #
 
 import sys
@@ -49,7 +49,6 @@ def PrepareDomoticzData(DData, idx, svalue):
         DData.append('{ "idx": '+str(idx)+', "svalue": "'+ str(svalue) +'" }')
     return DData
 
-#os.chdir(os.path.dirname(sys.argv[0]))
 os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
 
 # CONFIG
@@ -253,7 +252,7 @@ if influxdb=="1" and invstatus==1:
 
 # MQTT and Domoticz integration
 if mqtt==1 and invstatus==1:
-    # Initialise MQTT if configured
+    # Initialise MQTT connection
     client=paho.Client("inverter")
     if mqtt_tls=="1":
         client.tls_set(mqtt_cacert,tls_version=mqtt_tls_ver)
