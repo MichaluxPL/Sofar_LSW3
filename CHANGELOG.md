@@ -1,5 +1,5 @@
 # Change Log
-Get Sofart Inverter's data from solarman logger.
+Get Sofar Inverter's data from solarman logger.
 Tested with LSW-3 (SN 17xxxxxxx, 21xxxxxx)
  
 ## [1.0] - 2021-09-22
