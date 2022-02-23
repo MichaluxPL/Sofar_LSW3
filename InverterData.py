@@ -17,7 +17,6 @@ import configparser
 import datetime
 from influxdb import InfluxDBClient
 from datetime import datetime
-from time import sleep
 
 def twosComplement_hex(hexval, reg):
     if hexval=="":
