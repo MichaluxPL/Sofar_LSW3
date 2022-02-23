@@ -61,6 +61,9 @@ mqtt_cacert=                    # CA certificate path/filename
 [Domoticz]
 domoticz_support=0              # 0: disabled, 1: enabled
 
+[HomeAssistant]
+homeassistant_support=0         # 0: disabled, 1: enabled
+
 Files SOFARMap.xml and SOFARHWMap.xml contain MODBUS inverter's registers mapping for Sofar Solar K-TLX product line
 and Prometheus/InfluxDB metrics configuration.
 Edit i.e. to get captions in a different language, change Prometheus/InfluxDB metrics names or
