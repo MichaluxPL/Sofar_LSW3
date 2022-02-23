@@ -18,7 +18,7 @@ def hex_zfill(intval):
     hexvalue=hex(intval)
     return '0x' + str(hexvalue)[2:].zfill(4)
 
-os.chdir(os.path.dirname(sys.argv[0]))
+os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
 
 # CONFIG
 configParser = configparser.RawConfigParser()
