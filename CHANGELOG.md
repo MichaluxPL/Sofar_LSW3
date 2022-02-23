@@ -138,3 +138,14 @@ Fix version
 
 ### Fixed
 1. Reliable messages delivery to MQTT/Domoticz. 
+
+## [1.7] - 2022-02-23
+HomeAssistant support
+
+### Added
+1. Home Assistant support (via MQTT) - curtesy of @pablolite code
+
+### Changed
+1. Minor cleanups.
+
+### Fixed
