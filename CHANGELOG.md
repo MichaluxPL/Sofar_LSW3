@@ -157,7 +157,8 @@ MQTT support (including Domoticz/HomeAssistant) refactored
 
 ### Changed
 1. Basic MQTT message output as a separate option (independent from Domoticz or HomeAssistant support)
-2. Dedicated MQTT topic settings for basic support, Domoticz and HomeAssistant
-3. Additional parameters in config.cfg for above changes
+2. Basic MQTT output is now independent from Domoticz support
+3. Dedicated MQTT topic settings for basic support, Domoticz and HomeAssistant
+4. Additional parameters in config.cfg for above changes
 
 ### Fixed

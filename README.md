@@ -51,19 +51,22 @@ influxdb_dbname=                # Database name
 mqtt=0                          # 0: disabled, 1: enabled
 mqtt_server=                    # MQTT server IP address
 mqtt_port=1883                  # MQTT server tcp port
-mqtt_topic=                     # MQTT topic name
+mqtt_topic=                     # MQTT topic name for basic output
 mqtt_username=                  # MQTT access username
 mqtt_passwd=                    # MQTT user password
 mqtt_tls=0                      # Set to 1 to enable TLS support
 mqtt_tls_insecure=True          # Set to False to enable strict server's certificate hostname matching
 mqtt_tls_version=2              # 1 or 2
 mqtt_cacert=                    # CA certificate path/filename
+mqtt_basic=0                    # 0: disabled, 1: enabled (basic output to MQTT - all values in one message)
 
 [Domoticz]
 domoticz_support=0              # 0: disabled, 1: enabled
+domoticz_topic=                 # MQTT topic name for Domoticz integration
 
 [HomeAssistant]
 homeassistant_support=0         # 0: disabled, 1: enabled
+homeassistant_topc=             # MQTT topic name for HomeAssistant integration
 
 Files SOFARMap.xml and SOFARHWMap.xml contain MODBUS inverter's registers mapping for Sofar Solar K-TLX product line
 and Prometheus/InfluxDB metrics configuration.
