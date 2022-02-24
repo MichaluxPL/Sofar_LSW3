@@ -165,29 +165,33 @@ You tell me :)
 Feel free to suggest :)
 If You want to rewrite or/add change anything - please fork Your own project.
 
-# Domoticz/MQTT Support
+# MQTT Support
 ```
-    1. JSON_attributes_topic (unless Domoticz support enabled !): "mqtt_topic/attributes"
+    1. To enable set all variables in MQTT section in config.cfg
     2. For MQTT TLS support You'll need at least CA Certificate and TLS enabled MQTT
        To enable TLS for Mosquitto look i.e here: http://www.steves-internet-guide.com/mosquitto-tls/
-    3. To turn Domoticz support on:
+    3. If You want basic MQTT message output (all values in one message) - set mqtt_basic=1
+    4. Tested with Mosquitto MQTT server (both with and without TLS)
+    5. Configuration also required by Domoticz and HomeAssistant support
+```
+# Domoticz (via MQTT) Support
+```
+    1. Requires MQTT configuration in config.cfg (see section MQTT Support)
+    2. To turn Domoticz support on:
        a) enable it in config.cfg
-       b) set mqtt_topic=domoticz/in in config.cfg
+       b) set domoticz_mqtt_topic=domoticz/in in config.cfg
        c) create virtual devices in Domoticz (write down their idx numbers)
        d) in SOFARMap.xml find corresponding variables and for each input idx number
        e) leave "DomoticzIdx":0 for variables You don't want to send data to Domoticz
-       WARNING: When enabled, Domoticz support disables normal MQTT message delivery (all values in one message).
     3. Tested with Mosquitto MQTT server (both with and without TLS) and Domoticz 2021.1
 ```
 # HomeAssistant (via MQTT) Support (prepared/tested by @pablolite, optimized by Michalux)
 ```
-    1. For MQTT/TLS support You'll need at least CA Certificate and TLS enabled MQTT
-       To enable TLS for Mosquitto look i.e here: http://www.steves-internet-guide.com/mosquitto-tls/
-    2. To turn HomeAssistant support on, enable it in config.cfg
-    3. Hardcoded MQTT topic names:
-       a) Auto-discovery: homeassistant/sensor/SofarLogger/{Inverter's SN}_ID/config
-       b) Values: Sofar/Logger/{Inverter's SN}/state/{Param name}
-       c) Inverter's status: Sofar/Logger/{Inverter's SN}/enabled
+    1. Requires MQTT configuration in config.cfg (see section MQTT Support)
+    2. To turn HomeAssistant support on:
+        a) enable it in config.cfg
+        b) set ha_mqtt_topic in config.cfg
+    3. Hardcoded auto-discovery MQTT topic name: homeassistant/sensor/SofarLogger/{Inverter's SN}_ID/config
 ```
 # Prometheus+Grafana support
 ```

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # Script gathering solar data from Sofar Solar Inverter (K-TLX) via logger module LSW-3/LSE
 # by Michalux (based on DEYE script by jlopez77, HA initial code by pablolite).
-# Version: 1.7
+# Version: 1.8
 #
 
 import sys
@@ -63,6 +63,7 @@ reg_end1=(int(configParser.get('SofarInverter', 'register_end1'),0))
 reg_start2=(int(configParser.get('SofarInverter', 'register_start2'),0))
 reg_end2=(int(configParser.get('SofarInverter', 'register_end2'),0))
 mqtt=int(configParser.get('MQTT', 'mqtt'))
+mqtt_basic=configParser.get('MQTT', 'mqtt_basic')
 mqtt_server=configParser.get('MQTT', 'mqtt_server')
 mqtt_port=int(configParser.get('MQTT', 'mqtt_port'))
 mqtt_topic=configParser.get('MQTT', 'mqtt_topic')
@@ -83,7 +84,9 @@ ifuser=configParser.get('InfluxDB', 'influxdb_user')
 ifpass=configParser.get('InfluxDB', 'influxdb_password')
 ifdb=configParser.get('InfluxDB', 'influxdb_dbname')
 DomoticzSupport=configParser.get('Domoticz', 'domoticz_support')
+domoticz_mqtt_topic=configParser.get('Domoticz', 'domoticz_mqtt_topic')
 HomeAssistantSupport=configParser.get('HomeAssistant', 'homeassistant_support')
+ha_mqtt_topic=configParser.get('HomeAssistant', 'ha_mqtt_topic')
 # END CONFIG
 
 timestamp=str(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
@@ -240,6 +243,7 @@ while chunks<2:
   pfin=reg_end2
  chunks+=1
 output=output[:-1]+"}"
+jsonoutput=json.loads(output)
 
 # Write data to a prometheus integration file
 if prometheus=="1" and invstatus==1:
@@ -255,7 +259,7 @@ if influxdb=="1" and invstatus==1:
     if verbose=="1": print("Influx data: ",InfluxData);
 
 # MQTT integration (Domoticz, HA, pure MQTT)
-if mqtt==1 and invstatus==1:
+if mqtt==1:
     # Initialise MQTT connection
     client=paho.Client("inverter")
     if mqtt_tls=="1":
@@ -264,60 +268,76 @@ if mqtt==1 and invstatus==1:
     client.username_pw_set(username=mqtt_username, password=mqtt_passwd)
     client.connect(mqtt_server, mqtt_port)
     client.loop_start()
-    # Send data to Domoticz if support enabled
-    if DomoticzSupport=="1":
-        if verbose=="1": print("*** MQTT messages for Domoticz:");
-        for mqtt_data in DomoticzData:
-            if verbose=="1": print(mqtt_topic, mqtt_data);
-            result=client.publish(mqtt_topic, mqtt_data, retain=True)
+    if invstatus==1:
+        # Send data to MQTT in basic format
+        if mqtt_basic=="1":
+            result=client.publish(mqtt_topic, output)
+            result.wait_for_publish()
+            if result.is_published:
+                if verbose=="1": print("*** Data has been succesfully published to MQTT with topic: "+mqtt_topic)
+            else:
+                print("Error publishing data to MQTT")
+        # Send data to Domoticz if support enabled
+        if DomoticzSupport=="1":
+            if verbose=="1": print("*** MQTT messages for Domoticz:");
+            for mqtt_data in DomoticzData:
+                if verbose=="1": print(domoticz_mqtt_topic, mqtt_data);
+                result=client.publish(domoticz_mqtt_topic, mqtt_data, retain=True)
+                result.wait_for_publish()
+                if not result.is_published:
+                    print("Error publishing data for Domoticz to MQTT")
+        if HomeAssistantSupport=="1":
+            if verbose=="1": print("*** MQTT messages for HomeAssistant:");
+            # Send messages in case of unexpected disconnection
+            client.will_set(ha_mqtt_topic+str(inverter_sn)+"/state/connected","false")
+            # Send status of device: enabled = true
+            result=client.publish(ha_mqtt_topic+str(inverter_sn)+"/enabled","true")
             result.wait_for_publish()
             if not result.is_published:
-                print("Error publishing data for Domoticz to MQTT")
+                print("Error publishing device status for HomeAssistant to MQTT")
+            # Send state of device: connected = true
+            result=client.publish(ha_mqtt_topic+str(inverter_sn)+"/state/connected","true")
+            result.wait_for_publish()
+            if not result.is_published:
+                print("Error publishing device state for HomeAssistant to MQTT")
+            HAcount=0
+            for mqtt_data in HomeAssistantData:
+                # Sensors for ENERGY module with kWh, Wh, W
+                if mqtt_data[2] in ['kWh', 'Wh', 'W']:
+                    # Send auto-discover device sensor template
+                    result=client.publish("homeassistant/sensor/SofarLogger/"+str(inverter_sn)+"_"+str(HAcount)+"/config","{\"avty\":{\"topic\":\""+ha_mqtt_topic+str(inverter_sn)+"/state/connected\",\"payload_available\":\"true\",\"payload_not_available\":\"false\"},\"~\":\""+ha_mqtt_topic+str(inverter_sn)+"/\",\"device\":{\"ids\":\""+str(inverter_sn)+"\",\"mf\":\"Sofar\",\"name\":\"WLS-3\",\"sw\":\"x.x.x\"},\"name\":\""+(mqtt_data[0])+" ["+(mqtt_data[2])+"]\",\"uniq_id\":\""+str(inverter_sn)+"_"+str(HAcount)+"\",\"qos\":0,\"unit_of_meas\":\""+(mqtt_data[2])+"\",\"stat_t\":\"~state/"+(mqtt_data[4])+(mqtt_data[6])+"\",\"val_tpl\":\"{{ value | round(5) }}\",\"dev_cla\":\"energy\",\"state_class\":\"total_increasing\"}")
+                # Rest of the sensors
+                else:
+                    # Send auto-discover device sensor template
+                    result=client.publish("homeassistant/sensor/SofarLogger/"+str(inverter_sn)+"_"+str(HAcount)+"/config","{\"avty\":{\"topic\":\""+ha_mqtt_topic+str(inverter_sn)+"/state/connected\",\"payload_available\":\"true\",\"payload_not_available\":\"false\"},\"~\":\""+ha_mqtt_topic+str(inverter_sn)+"/\",\"device\":{\"ids\":\""+str(inverter_sn)+"\",\"mf\":\"Sofar\",\"name\":\"WLS-3\",\"sw\":\"x.x.x\"},\"name\":\""+(mqtt_data[0])+" ["+(mqtt_data[2])+"]\",\"uniq_id\":\""+str(inverter_sn)+"_"+str(HAcount)+"\",\"qos\":0,\"unit_of_meas\":\""+(mqtt_data[2])+"\",\"stat_t\":\"~state/"+(mqtt_data[4])+(mqtt_data[6])+"\",\"val_tpl\":\"{{ value | round(5) }}\",\"dev_cla\":\"current\",\"state_class\":\"measurement\"}")
+                result.wait_for_publish()
+                if not result.is_published:
+                    print("[",str(HAcount),"]", "Error publishing data for HomeAssistant to MQTT")
+                else:
+                    if verbose=="1": print("[",str(HAcount),"]", mqtt_data[0], ": ", mqtt_data[7]);
+                # Send sensor values data
+                result=client.publish(ha_mqtt_topic+str(inverter_sn)+"/state/"+(mqtt_data[4])+(mqtt_data[6]), (mqtt_data[7]))
+                result.wait_for_publish()
+                if not result.is_published:
+                    print("[",str(HAcount),"]","Error publishing data for HomeAssistant to MQTT")
+                HAcount+=1
     else:
-        result=client.publish(mqtt_topic+"/attributes",output)
-        result.wait_for_publish()
-        if result.is_published:
-            if verbose==1: print("*** Data has been succesfully published to MQTT with topic: "+mqtt_topic+"/attributes")
-        else:
-            print("Error publishing data to MQTT")
-    if HomeAssistantSupport=="1":
-        if verbose=="1": print("*** MQTT messages for HomeAssistant:");
-        # Send messages in case of unexpected disconnection
-        client.will_set("Sofar/Logger/"+str(inverter_sn)+"/state/connected","false")
-        # Send status of device: enabled = true
-        result=client.publish("Sofar/Logger/"+str(inverter_sn)+"/enabled","true")
-        result.wait_for_publish()
-        if not result.is_published:
-            print("Error publishing device status for HomeAssistant to MQTT")
-        # Send state of device: connected = true
-        result=client.publish("Sofar/Logger/"+str(inverter_sn)+"/state/connected","true")
-        result.wait_for_publish()
-        if not result.is_published:
-            print("Error publishing device state for HomeAssistant to MQTT")
-        HAcount=0
-        for mqtt_data in HomeAssistantData:
-            # Sensors for ENERGY module with kWh, Wh, W
-            #if mqtt_data[2]=="kWh" or mqtt_data[2]=="Wh" or mqtt_data[2]=="W":
-            if mqtt_data[2] in ['kWh', 'Wh', 'W']:
-                # Send auto-discover device sensor template
-                result=client.publish("homeassistant/sensor/SofarLogger/"+str(inverter_sn)+"_"+str(HAcount)+"/config","{\"avty\":{\"topic\":\"Sofar/Logger/"+str(inverter_sn)+"/state/connected\",\"payload_available\":\"true\",\"payload_not_available\":\"false\"},\"~\":\"Sofar/Logger/"+str(inverter_sn)+"/\",\"device\":{\"ids\":\""+str(inverter_sn)+"\",\"mf\":\"Sofar\",\"name\":\"WLS-3\",\"sw\":\"x.x.x\"},\"name\":\""+(mqtt_data[0])+" ["+(mqtt_data[2])+"]\",\"uniq_id\":\""+str(inverter_sn)+"_"+str(HAcount)+"\",\"qos\":0,\"unit_of_meas\":\""+(mqtt_data[2])+"\",\"stat_t\":\"~state/"+(mqtt_data[4])+(mqtt_data[6])+"\",\"val_tpl\":\"{{ value | round(5) }}\",\"dev_cla\":\"energy\",\"state_class\":\"total_increasing\"}")
-            # Rest of the sensors
-            else:
-                # Send auto-discover device sensor template
-                result=client.publish("homeassistant/sensor/SofarLogger/"+str(inverter_sn)+"_"+str(HAcount)+"/config","{\"avty\":{\"topic\":\"Sofar/Logger/"+str(inverter_sn)+"/state/connected\",\"payload_available\":\"true\",\"payload_not_available\":\"false\"},\"~\":\"Sofar/Logger/"+str(inverter_sn)+"/\",\"device\":{\"ids\":\""+str(inverter_sn)+"\",\"mf\":\"Sofar\",\"name\":\"WLS-3\",\"sw\":\"x.x.x\"},\"name\":\""+(mqtt_data[0])+" ["+(mqtt_data[2])+"]\",\"uniq_id\":\""+str(inverter_sn)+"_"+str(HAcount)+"\",\"qos\":0,\"unit_of_meas\":\""+(mqtt_data[2])+"\",\"stat_t\":\"~state/"+(mqtt_data[4])+(mqtt_data[6])+"\",\"val_tpl\":\"{{ value | round(5) }}\",\"dev_cla\":\"current\",\"state_class\":\"measurement\"}")
+        if mqtt_basic=="1":
+            result=client.publish(mqtt_topic, "{\"Status\": \""+jsonoutput["Status"]+"\"}")
             result.wait_for_publish()
             if not result.is_published:
-                print("[",str(HAcount),"]", "Error publishing data for HomeAssistant to MQTT")
-            else:
-                if verbose=="1": print("[",str(HAcount),"]", mqtt_data[0], ": ", mqtt_data[7]);
-            # Send sensor values data
-            result=client.publish("Sofar/Logger/"+str(inverter_sn)+"/state/"+(mqtt_data[4])+(mqtt_data[6]), (mqtt_data[7]))
+                print("Error publishing device status to MQTT")
+        if DomoticzSupport=="1":
+            result=client.publish(domoticz_mqtt_topic, DomoticzData[0], retain=True)
             result.wait_for_publish()
             if not result.is_published:
-                print("[",str(HAcount),"]","Error publishing data for HomeAssistant to MQTT")
-            HAcount+=1
+                print("Error publishing device status for Domoticz to MQTT")
+        if HomeAssistantSupport=="1":
+            result=client.publish(ha_mqtt_topic+str(inverter_sn)+"/state/connected","false")
+            result.wait_for_publish()
+            if not result.is_published:
+                print("Error publishing device status for HomeAssistant to MQTT")
     client.loop_stop()
     client.disconnect()
 print("*** JSON output:")
-jsonoutput=json.loads(output)
 print(json.dumps(jsonoutput, indent=4, sort_keys=False, ensure_ascii=False))

@@ -149,3 +149,15 @@ HomeAssistant support
 1. Minor cleanups.
 
 ### Fixed
+## [1.8] - 2022-02-24
+MQTT support (including Domoticz/HomeAssistant) refactored
+
+### Added
+1. Sending inverter's status to MQTT/Domoticz/HomeAssistant when the device is turned off.
+
+### Changed
+1. Basic MQTT message output as a separate option (independent from Domoticz or HomeAssistant support)
+2. Dedicated MQTT topic settings for basic support, Domoticz and HomeAssistant
+3. Additional parameters in config.cfg for above changes
+
+### Fixed
