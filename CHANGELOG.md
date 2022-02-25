@@ -143,7 +143,7 @@ Fix version
 HomeAssistant support
 
 ### Added
-1. Home Assistant support (via MQTT) - curtesy of @pablolite code
+1. Home Assistant support (via MQTT) - code courtesy of @pablolite
 
 ### Changed
 1. Minor cleanups.
@@ -157,8 +157,19 @@ MQTT support (including Domoticz/HomeAssistant) refactored
 
 ### Changed
 1. Basic MQTT message output as a separate option (independent from Domoticz or HomeAssistant support)
-2. Basic MQTT output is now independent from Domoticz support
-3. Dedicated MQTT topic settings for basic support, Domoticz and HomeAssistant
-4. Additional parameters in config.cfg for above changes
+2. Dedicated MQTT topic settings for basic support, Domoticz and HomeAssistant
+3. Additional parameters in config.cfg for above changes
 
 ### Fixed
+
+## [1.82] - 2022-02-25
+Fixes, code refactoring and clean-ups
+
+### Added
+1. Logger connecting messages in verbose mode
+
+### Changed
+1. Some code refactoring and unnecesarry parts removal
+
+### Fixed
+1. Sending offline status to MQTT (basic, Domoticz, HomeAssistant)

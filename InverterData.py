@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # Script gathering solar data from Sofar Solar Inverter (K-TLX) via logger module LSW-3/LSE
 # by Michalux (based on DEYE script by jlopez77, HA initial code by pablolite).
-# Version: 1.8
+# Version: 1.82
 #
 
 import sys
@@ -18,35 +18,35 @@ from influxdb import InfluxDBClient
 from datetime import datetime
 
 def twosComplement_hex(hexval, reg):
-    if hexval=="":
-        print("No value in response for register "+reg)
-        print("Check register start/end values in config.cfg")
-        sys.exit(1)
-    bits = 16
-    val = int(hexval, bits)
-    if val & (1 << (bits-1)):
-        val -= 1 << bits
-    return val
+  if hexval=="":
+    print("No value in response for register "+reg)
+    print("Check register start/end values in config.cfg")
+    sys.exit(1)
+  bits = 16
+  val = int(hexval, bits)
+  if val & (1 << (bits-1)):
+    val -= 1 << bits
+  return val
 
 # Prepare metrics for Prometheus
 def PMetrics(mname, mtype, mlabel, mlvalue, pdata):
-    line="# TYPE "+mname+" "+mtype+"\n"+mname+"{"+mlabel+"=\""+mlvalue+"\"} "+str(pdata)+"\n"
-    PMData.append(line)
+  line="# TYPE "+mname+" "+mtype+"\n"+mname+"{"+mlabel+"=\""+mlvalue+"\"} "+str(pdata)+"\n"
+  PMData.append(line)
 
 # Prepare data to write do InfluxDB
 def PrepareInfluxData(IfData, fieldname, fieldvalue):
-    IfData[0]["fields"][fieldname]=float(fieldvalue)
-    return IfData
+  IfData[0]["fields"][fieldname]=float(fieldvalue)
+  return IfData
 
 def Write2InfluxDB(IfData):
-    ifclient.write_points(IfData);
+  ifclient.write_points(IfData);
 
 def PrepareDomoticzData(DData, idx, svalue):
-    if isinstance(svalue, str):
-        DData.append('{ "idx": '+str(idx)+', "svalue": '+ svalue +' }')
-    else:
-        DData.append('{ "idx": '+str(idx)+', "svalue": "'+ str(svalue) +'" }')
-    return DData
+  if isinstance(svalue, str):
+    DData.append('{ "idx": '+str(idx)+', "svalue": '+ svalue +' }')
+  else:
+    DData.append('{ "idx": '+str(idx)+', "svalue": "'+ str(svalue) +'" }')
+  return DData
 
 os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
 
@@ -93,14 +93,14 @@ timestamp=str(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
 
 # Initialise InfluxDB support
 if influxdb=="1":
-    ifclient = InfluxDBClient(ifhost,ifport,ifuser,ifpass,ifdb);
-    InfluxData=[
-        {
-            "measurement": "InverterData",
-            "time": timestamp,
-            "fields": {}
-        }
-    ]
+  ifclient = InfluxDBClient(ifhost,ifport,ifuser,ifpass,ifdb);
+  InfluxData=[
+    {
+      "measurement": "InverterData",
+      "time": timestamp,
+      "fields": {}
+    }
+  ]
 
 # PREPARE & SEND DATA TO THE INVERTER
 output="{" # initialise json output
@@ -112,232 +112,240 @@ totaltime=0
 PMData=[]
 DomoticzData=[]
 HomeAssistantData=[]
+invstatus=1
 
-while chunks<2:
- if verbose=="1": print("*** Chunk no: ", chunks);
+# OPEN CONNECTION TO LOGGER
+if verbose=="1": print("Connecting to logger... ", end='');
+for res in socket.getaddrinfo(inverter_ip, inverter_port, socket.AF_INET, socket.SOCK_STREAM):
+  family, socktype, proto, canonname, sockadress = res
+  try:
+    clientSocket= socket.socket(family, socktype, proto);
+    clientSocket.settimeout(10);
+    clientSocket.connect(sockadress);
+  except socket.error as msg:
+    print("Could not open socket - inverter/logger turned off");
+    invstatus=0;
 
-# Data frame begin
- start = binascii.unhexlify('A5') #start
- length=binascii.unhexlify('1700') # datalength
- controlcode= binascii.unhexlify('1045') #controlCode
- serial=binascii.unhexlify('0000') # serial
- datafield = binascii.unhexlify('020000000000000000000000000000') #com.igen.localmode.dy.instruction.send.SendDataField
- #pos_ini=str(hex(pini)[2:4].zfill(2))+str(hex(pini)[4:6].zfill(2))
- pos_ini=str(hex(pini)[2:4].zfill(4))
- pos_fin=str(hex(pfin-pini+1)[2:4].zfill(4))
- businessfield= binascii.unhexlify('0103' + pos_ini + pos_fin) # sin CRC16MODBUS
- crc=binascii.unhexlify(str(hex(libscrc.modbus(businessfield))[4:6])+str(hex(libscrc.modbus(businessfield))[2:4])) # CRC16modbus
- checksum=binascii.unhexlify('00') #checksum F2
- endCode = binascii.unhexlify('15')
+if invstatus==1:
+  if verbose=="1": print("connected successfully !");
+  while chunks<2:
+    # Data frame begin
+    start = binascii.unhexlify('A5') #start
+    length=binascii.unhexlify('1700') # datalength
+    controlcode= binascii.unhexlify('1045') #controlCode
+    serial=binascii.unhexlify('0000') # serial
+    datafield = binascii.unhexlify('020000000000000000000000000000') #com.igen.localmode.dy.instruction.send.SendDataField
+    pos_ini=str(hex(pini)[2:4].zfill(4))
+    pos_fin=str(hex(pfin-pini+1)[2:4].zfill(4))
+    businessfield= binascii.unhexlify('0103' + pos_ini + pos_fin) # sin CRC16MODBUS
+    crc=binascii.unhexlify(str(hex(libscrc.modbus(businessfield))[4:6])+str(hex(libscrc.modbus(businessfield))[2:4])) # CRC16modbus
+    checksum=binascii.unhexlify('00') #checksum F2
+    endCode = binascii.unhexlify('15')
 
- inverter_sn2 = bytearray.fromhex(hex(inverter_sn)[8:10] + hex(inverter_sn)[6:8] + hex(inverter_sn)[4:6] + hex(inverter_sn)[2:4])
- frame = bytearray(start + length + controlcode + serial + inverter_sn2 + datafield + businessfield + crc + checksum + endCode)
- if verbose=="1": print("Sent data: ", frame);
- # Data frame end
+    inverter_sn2 = bytearray.fromhex(hex(inverter_sn)[8:10] + hex(inverter_sn)[6:8] + hex(inverter_sn)[4:6] + hex(inverter_sn)[2:4])
+    frame = bytearray(start + length + controlcode + serial + inverter_sn2 + datafield + businessfield + crc + checksum + endCode)
+    # Data frame end
 
- checksum = 0
- frame_bytes = bytearray(frame)
- for i in range(1, len(frame_bytes) - 2, 1):
-     checksum += frame_bytes[i] & 255
- frame_bytes[len(frame_bytes) - 2] = int((checksum & 255))
+    checksum = 0
+    frame_bytes = bytearray(frame)
+    for i in range(1, len(frame_bytes) - 2, 1):
+      checksum += frame_bytes[i] & 255
+    frame_bytes[len(frame_bytes) - 2] = int((checksum & 255))
 
- # OPEN SOCKET
- for res in socket.getaddrinfo(inverter_ip, inverter_port, socket.AF_INET, socket.SOCK_STREAM):
-                  family, socktype, proto, canonname, sockadress = res
-                  try:
-                   clientSocket= socket.socket(family,socktype,proto);
-                   clientSocket.settimeout(10);
-                   clientSocket.connect(sockadress);
-                  except socket.error as msg:
-                   print("Could not open socket - inverter/logger turned off");
-                   if prometheus=="1": prometheus_file.close();
-                   sys.exit(1)
+    if verbose=="1":
+      print("*** Chunk no: ", chunks);
+      print("Sent data: ", frame);
+    # SEND DATA
+    clientSocket.sendall(frame_bytes);
 
- # SEND DATA
- clientSocket.sendall(frame_bytes);
-
- ok=False;
- while (not ok):
-    try:
+    ok=False;
+    while (not ok):
+      try:
         data = clientSocket.recv(1024);
         ok=True
         try:
-            data
+          data
         except:
-            print("No data - Exit")
-            sys.exit(1) #Exit, no data
-    except socket.timeout as msg:
-        print("Connection timeout - inverter and/or gateway is off");
-        sys.exit(1) #Exit
+          print("No data - Exit")
+          sys.exit(1) #Exit, no data
+      except socket.timeout as msg:
+        print("Connection timeout - inverter and/or gateway is offline");
+        invstatus=0;
 
-# PARSE RESPONSE (start position 56, end position 60)
- if verbose=="1": print("Received data: ", data);
- i=pfin-pini
- a=0
- while a<=i:
-  p1=56+(a*4)
-  p2=60+(a*4)
-  hexpos=str("0x") + str(hex(a+pini)[2:].zfill(4)).upper()
-  response=twosComplement_hex(str(''.join(hex(ord(chr(x)))[2:].zfill(2) for x in bytearray(data))+'  '+re.sub('[^\x20-\x7f]', '', ''))[p1:p2], hexpos)
-  with open("./SOFARMap.xml") as txtfile:
-   parameters=json.loads(txtfile.read())
-  for parameter in parameters:
-   for item in parameter["items"]:
-     if lang=="PL":
-        title=item["titlePL"]
-     else:
-        title=item["titleEN"]
-     ratio=item["ratio"]
-     unit=item["unit"]
-     graph=item["graph"]
-     metric_name=item["metric_name"]
-     label_name=item["label_name"]
-     label_value=item["label_value"]
-     metric_type=item["metric_type"]
-     DomoticzIdx=item["DomoticzIdx"]
-     for register in item["registers"]:
-      if register==hexpos and chunks!=-1:
-       response=round(response*ratio,2)
-       for option in item["optionRanges"]:
-        if option["key"] == response:
-            if label_name=="Status":
-                if response==2:
-                    invstatus=1
-                else:
-                    invstatus=0
-            if lang == "PL":
-                response='"'+option["valuePL"]+'"'
+    if invstatus==1:
+      # PARSE RESPONSE (start position 56, end position 60)
+      if verbose=="1": print("Received data: ", data);
+      i=pfin-pini
+      a=0
+      while a<=i:
+        p1=56+(a*4)
+        p2=60+(a*4)
+        hexpos=str("0x") + str(hex(a+pini)[2:].zfill(4)).upper()
+        response=twosComplement_hex(str(''.join(hex(ord(chr(x)))[2:].zfill(2) for x in bytearray(data))+'  '+re.sub('[^\x20-\x7f]', '', ''))[p1:p2], hexpos)
+        with open("./SOFARMap.xml") as txtfile:
+          parameters=json.loads(txtfile.read())
+        for parameter in parameters:
+          for item in parameter["items"]:
+            if lang=="PL":
+              title=item["titlePL"]
             else:
-                response='"'+option["valueEN"]+'"'
-       if hexpos!='0x0015' and hexpos!='0x0016' and hexpos!='0x0017' and hexpos!='0x0018':
-        if verbose=="1": print(hexpos+" - "+title+": "+str(response)+unit);
-        if prometheus=="1" and graph==1: PMetrics(metric_name, metric_type, label_name, label_value, response);
-        if influxdb=="1" and graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, response);
-        if DomoticzSupport=="1" and DomoticzIdx>0: PrepareDomoticzData(DomoticzData, DomoticzIdx, response);
-        if HomeAssistantSupport=="1": HomeAssistantData.append([title, ratio, unit, metric_type, metric_name, label_name, label_value, response, register]);
-        if unit!="":
-            output=output+"\""+ title + " (" + unit + ")" + "\":" + str(response)+","
-        else:
-            output=output+"\""+ title + "\":" + str(response)+","
-       if hexpos=='0x0015': totalpower+=response*ratio*65536;
-       if hexpos=='0x0016':
-        totalpower+=response*ratio
-        if verbose=="1": print(hexpos+" - "+title+": "+str(response*ratio)+unit);
-        output=output+"\""+ title + " (" + unit + ")" + "\":" + str(totalpower)+","
-        if prometheus=="1" and graph==1: PMetrics(metric_name, metric_type, label_name, label_value, (totalpower*1000));
-        if influxdb=="1" and graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, totalpower);
-        if DomoticzSupport=="1" and DomoticzIdx>0: PrepareDomoticzData(DomoticzData, DomoticzIdx, response);
-        if HomeAssistantSupport=="1": HomeAssistantData.append([title, ratio, unit, metric_type, metric_name, label_name, label_value, response, (totalpower*1000)]);
-       if hexpos=='0x0017': totaltime+=response*ratio*65536;
-       if hexpos=='0x0018':
-        totaltime+=response*ratio
-        if verbose=="1": print(hexpos+" - "+title+": "+str(response*ratio)+unit);
-        output=output+"\""+ title + " (" + unit + ")" + "\":" + str(totaltime)+","
-        if prometheus=="1" and graph==1: PMetrics(metric_name, metric_type, label_name, label_value, totaltime);
-        if influxdb=="1" and graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, totaltime);
-        if DomoticzSupport=="1" and DomoticzIdx>0: PrepareDomoticzData(DomoticzData, DomoticzIdx, response);
-        if HomeAssistantSupport=="1": HomeAssistantData.append([title, ratio, unit, metric_type, metric_name, label_name, label_value, response, totaltime]);
-  a+=1
- if chunks==0:
-  pini=reg_start2
-  pfin=reg_end2
- chunks+=1
+              title=item["titleEN"]
+            ratio=item["ratio"]
+            unit=item["unit"]
+            graph=item["graph"]
+            metric_name=item["metric_name"]
+            label_name=item["label_name"]
+            label_value=item["label_value"]
+            metric_type=item["metric_type"]
+            DomoticzIdx=item["DomoticzIdx"]
+            for register in item["registers"]:
+              if register==hexpos and chunks!=-1:
+                response=round(response*ratio,2)
+                for option in item["optionRanges"]:
+                  if option["key"] == response:
+                    if label_name=="Status":
+                      if response==2:
+                        invstatus=1
+                      else:
+                        invstatus=0
+                    if lang == "PL":
+                      response='"'+option["valuePL"]+'"'
+                    else:
+                      response='"'+option["valueEN"]+'"'
+                if hexpos!='0x0015' and hexpos!='0x0016' and hexpos!='0x0017' and hexpos!='0x0018':
+                  if verbose=="1": print(hexpos+" - "+title+": "+str(response)+unit);
+                  if prometheus=="1" and graph==1: PMetrics(metric_name, metric_type, label_name, label_value, response);
+                  if influxdb=="1" and graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, response);
+                  if DomoticzSupport=="1" and DomoticzIdx>0: PrepareDomoticzData(DomoticzData, DomoticzIdx, response);
+                  if HomeAssistantSupport=="1": HomeAssistantData.append([title, ratio, unit, metric_type, metric_name, label_name, label_value, response, register]);
+                  if unit!="":
+                    output=output+"\""+ title + " (" + unit + ")" + "\":" + str(response)+","
+                  else:
+                    output=output+"\""+ title + "\":" + str(response)+","
+                if hexpos=='0x0015': totalpower+=response*ratio*65536;
+                if hexpos=='0x0016':
+                  totalpower+=response*ratio
+                  if verbose=="1": print(hexpos+" - "+title+": "+str(response*ratio)+unit);
+                  output=output+"\""+ title + " (" + unit + ")" + "\":" + str(totalpower)+","
+                  if prometheus=="1" and graph==1: PMetrics(metric_name, metric_type, label_name, label_value, (totalpower*1000));
+                  if influxdb=="1" and graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, totalpower);
+                  if DomoticzSupport=="1" and DomoticzIdx>0: PrepareDomoticzData(DomoticzData, DomoticzIdx, response);
+                  if HomeAssistantSupport=="1": HomeAssistantData.append([title, ratio, unit, metric_type, metric_name, label_name, label_value, response, (totalpower*1000)]);
+                if hexpos=='0x0017': totaltime+=response*ratio*65536;
+                if hexpos=='0x0018':
+                  totaltime+=response*ratio
+                  if verbose=="1": print(hexpos+" - "+title+": "+str(response*ratio)+unit);
+                  output=output+"\""+ title + " (" + unit + ")" + "\":" + str(totaltime)+","
+                  if prometheus=="1" and graph==1: PMetrics(metric_name, metric_type, label_name, label_value, totaltime);
+                  if influxdb=="1" and graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, totaltime);
+                  if DomoticzSupport=="1" and DomoticzIdx>0: PrepareDomoticzData(DomoticzData, DomoticzIdx, response);
+                  if HomeAssistantSupport=="1": HomeAssistantData.append([title, ratio, unit, metric_type, metric_name, label_name, label_value, response, totaltime]);
+        a+=1
+      if chunks==0:
+        pini=reg_start2
+        pfin=reg_end2
+      chunks+=1
 output=output[:-1]+"}"
-jsonoutput=json.loads(output)
+if invstatus>0:
+  jsonoutput=json.loads(output)
+  print("*** JSON output:")
+  print(json.dumps(jsonoutput, indent=4, sort_keys=False, ensure_ascii=False))
 
 # Write data to a prometheus integration file
 if prometheus=="1" and invstatus==1:
-    prometheus_file = open(prometheus_file, "w");
-    for i in range(0, len(PMData)):
-        prometheus_file.write(PMData[i])
-        if verbose=="1": print(PMData[i]);
-    prometheus_file.close();
+  prometheus_file = open(prometheus_file, "w");
+  for i in range(0, len(PMData)):
+    prometheus_file.write(PMData[i])
+    if verbose=="1": print(PMData[i]);
+  prometheus_file.close();
 
 # Write data to Influx DB
 if influxdb=="1" and invstatus==1:
-    Write2InfluxDB(InfluxData)
-    if verbose=="1": print("Influx data: ",InfluxData);
+  Write2InfluxDB(InfluxData)
+  if verbose=="1": print("Influx data: ",InfluxData);
 
 # MQTT integration (Domoticz, HA, pure MQTT)
 if mqtt==1:
-    # Initialise MQTT connection
-    client=paho.Client("inverter")
-    if mqtt_tls=="1":
-        client.tls_set(mqtt_cacert,tls_version=mqtt_tls_ver)
-        client.tls_insecure_set(mqtt_tls_insecure)
-    client.username_pw_set(username=mqtt_username, password=mqtt_passwd)
-    client.connect(mqtt_server, mqtt_port)
-    client.loop_start()
-    if invstatus==1:
-        # Send data to MQTT in basic format
-        if mqtt_basic=="1":
-            result=client.publish(mqtt_topic, output)
-            result.wait_for_publish()
-            if result.is_published:
-                if verbose=="1": print("*** Data has been succesfully published to MQTT with topic: "+mqtt_topic)
-            else:
-                print("Error publishing data to MQTT")
-        # Send data to Domoticz if support enabled
-        if DomoticzSupport=="1":
-            if verbose=="1": print("*** MQTT messages for Domoticz:");
-            for mqtt_data in DomoticzData:
-                if verbose=="1": print(domoticz_mqtt_topic, mqtt_data);
-                result=client.publish(domoticz_mqtt_topic, mqtt_data, retain=True)
-                result.wait_for_publish()
-                if not result.is_published:
-                    print("Error publishing data for Domoticz to MQTT")
-        if HomeAssistantSupport=="1":
-            if verbose=="1": print("*** MQTT messages for HomeAssistant:");
-            # Send messages in case of unexpected disconnection
-            client.will_set(ha_mqtt_topic+str(inverter_sn)+"/state/connected","false")
-            # Send status of device: enabled = true
-            result=client.publish(ha_mqtt_topic+str(inverter_sn)+"/enabled","true")
-            result.wait_for_publish()
-            if not result.is_published:
-                print("Error publishing device status for HomeAssistant to MQTT")
-            # Send state of device: connected = true
-            result=client.publish(ha_mqtt_topic+str(inverter_sn)+"/state/connected","true")
-            result.wait_for_publish()
-            if not result.is_published:
-                print("Error publishing device state for HomeAssistant to MQTT")
-            HAcount=0
-            for mqtt_data in HomeAssistantData:
-                # Sensors for ENERGY module with kWh, Wh, W
-                if mqtt_data[2] in ['kWh', 'Wh', 'W']:
-                    # Send auto-discover device sensor template
-                    result=client.publish("homeassistant/sensor/SofarLogger/"+str(inverter_sn)+"_"+str(HAcount)+"/config","{\"avty\":{\"topic\":\""+ha_mqtt_topic+str(inverter_sn)+"/state/connected\",\"payload_available\":\"true\",\"payload_not_available\":\"false\"},\"~\":\""+ha_mqtt_topic+str(inverter_sn)+"/\",\"device\":{\"ids\":\""+str(inverter_sn)+"\",\"mf\":\"Sofar\",\"name\":\"WLS-3\",\"sw\":\"x.x.x\"},\"name\":\""+(mqtt_data[0])+" ["+(mqtt_data[2])+"]\",\"uniq_id\":\""+str(inverter_sn)+"_"+str(HAcount)+"\",\"qos\":0,\"unit_of_meas\":\""+(mqtt_data[2])+"\",\"stat_t\":\"~state/"+(mqtt_data[4])+(mqtt_data[6])+"\",\"val_tpl\":\"{{ value | round(5) }}\",\"dev_cla\":\"energy\",\"state_class\":\"total_increasing\"}")
-                # Rest of the sensors
-                else:
-                    # Send auto-discover device sensor template
-                    result=client.publish("homeassistant/sensor/SofarLogger/"+str(inverter_sn)+"_"+str(HAcount)+"/config","{\"avty\":{\"topic\":\""+ha_mqtt_topic+str(inverter_sn)+"/state/connected\",\"payload_available\":\"true\",\"payload_not_available\":\"false\"},\"~\":\""+ha_mqtt_topic+str(inverter_sn)+"/\",\"device\":{\"ids\":\""+str(inverter_sn)+"\",\"mf\":\"Sofar\",\"name\":\"WLS-3\",\"sw\":\"x.x.x\"},\"name\":\""+(mqtt_data[0])+" ["+(mqtt_data[2])+"]\",\"uniq_id\":\""+str(inverter_sn)+"_"+str(HAcount)+"\",\"qos\":0,\"unit_of_meas\":\""+(mqtt_data[2])+"\",\"stat_t\":\"~state/"+(mqtt_data[4])+(mqtt_data[6])+"\",\"val_tpl\":\"{{ value | round(5) }}\",\"dev_cla\":\"current\",\"state_class\":\"measurement\"}")
-                result.wait_for_publish()
-                if not result.is_published:
-                    print("[",str(HAcount),"]", "Error publishing data for HomeAssistant to MQTT")
-                else:
-                    if verbose=="1": print("[",str(HAcount),"]", mqtt_data[0], ": ", mqtt_data[7]);
-                # Send sensor values data
-                result=client.publish(ha_mqtt_topic+str(inverter_sn)+"/state/"+(mqtt_data[4])+(mqtt_data[6]), (mqtt_data[7]))
-                result.wait_for_publish()
-                if not result.is_published:
-                    print("[",str(HAcount),"]","Error publishing data for HomeAssistant to MQTT")
-                HAcount+=1
-    else:
-        if mqtt_basic=="1":
-            result=client.publish(mqtt_topic, "{\"Status\": \""+jsonoutput["Status"]+"\"}")
-            result.wait_for_publish()
-            if not result.is_published:
-                print("Error publishing device status to MQTT")
-        if DomoticzSupport=="1":
-            result=client.publish(domoticz_mqtt_topic, DomoticzData[0], retain=True)
-            result.wait_for_publish()
-            if not result.is_published:
-                print("Error publishing device status for Domoticz to MQTT")
-        if HomeAssistantSupport=="1":
-            result=client.publish(ha_mqtt_topic+str(inverter_sn)+"/state/connected","false")
-            result.wait_for_publish()
-            if not result.is_published:
-                print("Error publishing device status for HomeAssistant to MQTT")
-    client.loop_stop()
-    client.disconnect()
-print("*** JSON output:")
-print(json.dumps(jsonoutput, indent=4, sort_keys=False, ensure_ascii=False))
+  # Initialise MQTT connection
+  client=paho.Client("inverter")
+  if mqtt_tls=="1":
+    client.tls_set(mqtt_cacert,tls_version=mqtt_tls_ver)
+    client.tls_insecure_set(mqtt_tls_insecure)
+  client.username_pw_set(username=mqtt_username, password=mqtt_passwd)
+  client.connect(mqtt_server, mqtt_port)
+  client.loop_start()
+  if invstatus==1:
+    # Send data to MQTT in basic format
+    if mqtt_basic=="1":
+      result=client.publish(mqtt_topic, output)
+      result.wait_for_publish()
+      if result.is_published:
+        if verbose=="1": print("*** Data has been succesfully published to MQTT with topic: "+mqtt_topic)
+      else:
+        print("Error publishing data to MQTT")
+    # Send data to Domoticz if support enabled
+    if DomoticzSupport=="1":
+      if verbose=="1": print("*** MQTT messages for Domoticz:");
+      for mqtt_data in DomoticzData:
+        if verbose=="1": print(domoticz_mqtt_topic, mqtt_data);
+        result=client.publish(domoticz_mqtt_topic, mqtt_data, retain=True)
+        result.wait_for_publish()
+        if not result.is_published:
+          print("Error publishing data for Domoticz to MQTT")
+    # Send data to HomeAssistant if support enabled
+    if HomeAssistantSupport=="1":
+      if verbose=="1": print("*** MQTT messages for HomeAssistant:");
+      # Send messages in case of unexpected disconnection
+      client.will_set(ha_mqtt_topic+str(inverter_sn)+"/state/connected","false")
+      # Send status of the device: enabled = true
+      result=client.publish(ha_mqtt_topic+str(inverter_sn)+"/enabled","true")
+      result.wait_for_publish()
+      if not result.is_published:
+        print("Error publishing device status for HomeAssistant to MQTT")
+      # Send state of the device: connected = true
+      result=client.publish(ha_mqtt_topic+str(inverter_sn)+"/state/connected","true")
+      result.wait_for_publish()
+      if not result.is_published:
+        print("Error publishing device state for HomeAssistant to MQTT")
+      HAcount=0
+      for mqtt_data in HomeAssistantData:
+        # Sensors for ENERGY module with kWh, Wh, W
+        if mqtt_data[2] in ['kWh', 'Wh', 'W']:
+          # Send auto-discover device sensor template
+          result=client.publish("homeassistant/sensor/SofarLogger/"+str(inverter_sn)+"_"+str(HAcount)+"/config","{\"avty\":{\"topic\":\""+ha_mqtt_topic+str(inverter_sn)+"/state/connected\",\"payload_available\":\"true\",\"payload_not_available\":\"false\"},\"~\":\""+ha_mqtt_topic+str(inverter_sn)+"/\",\"device\":{\"ids\":\""+str(inverter_sn)+"\",\"mf\":\"Sofar\",\"name\":\"WLS-3\",\"sw\":\"x.x.x\"},\"name\":\""+(mqtt_data[0])+" ["+(mqtt_data[2])+"]\",\"uniq_id\":\""+str(inverter_sn)+"_"+str(HAcount)+"\",\"qos\":0,\"unit_of_meas\":\""+(mqtt_data[2])+"\",\"stat_t\":\"~state/"+(mqtt_data[4])+(mqtt_data[6])+"\",\"val_tpl\":\"{{ value | round(5) }}\",\"dev_cla\":\"energy\",\"state_class\":\"total_increasing\"}")
+        # Rest of the sensors
+        else:
+          # Send auto-discover device sensor template
+          result=client.publish("homeassistant/sensor/SofarLogger/"+str(inverter_sn)+"_"+str(HAcount)+"/config","{\"avty\":{\"topic\":\""+ha_mqtt_topic+str(inverter_sn)+"/state/connected\",\"payload_available\":\"true\",\"payload_not_available\":\"false\"},\"~\":\""+ha_mqtt_topic+str(inverter_sn)+"/\",\"device\":{\"ids\":\""+str(inverter_sn)+"\",\"mf\":\"Sofar\",\"name\":\"WLS-3\",\"sw\":\"x.x.x\"},\"name\":\""+(mqtt_data[0])+" ["+(mqtt_data[2])+"]\",\"uniq_id\":\""+str(inverter_sn)+"_"+str(HAcount)+"\",\"qos\":0,\"unit_of_meas\":\""+(mqtt_data[2])+"\",\"stat_t\":\"~state/"+(mqtt_data[4])+(mqtt_data[6])+"\",\"val_tpl\":\"{{ value | round(5) }}\",\"dev_cla\":\"current\",\"state_class\":\"measurement\"}")
+        result.wait_for_publish()
+        if not result.is_published:
+          print("[",str(HAcount),"]", "Error publishing data for HomeAssistant to MQTT")
+        else:
+          if verbose=="1": print("[",str(HAcount),"]", mqtt_data[0], ": ", mqtt_data[7]);
+        # Send sensor values data
+        result=client.publish(ha_mqtt_topic+str(inverter_sn)+"/state/"+(mqtt_data[4])+(mqtt_data[6]), (mqtt_data[7]))
+        result.wait_for_publish()
+        if not result.is_published:
+          print("[",str(HAcount),"]","Error publishing data for HomeAssistant to MQTT")
+        HAcount+=1
+  else:
+      # Send offline message
+      if mqtt_basic=="1":
+        result=client.publish(mqtt_topic, "{\"Status\": \"Offline\"}")
+        result.wait_for_publish()
+        if not result.is_published:
+          print("Error publishing device status to MQTT")
+      if DomoticzSupport=="1":
+        with open("./SOFARMap.xml") as txtfile:
+          parameters=json.loads(txtfile.read())
+        result=client.publish(domoticz_mqtt_topic, "{ \"idx\": "+str(parameters[2]['items'][0]['DomoticzIdx'])+", \"svalue\": \"Off\" }", retain=True)
+        result.wait_for_publish()
+        if not result.is_published:
+          print("Error publishing device status for Domoticz to MQTT")
+      if HomeAssistantSupport=="1":
+        result=client.publish(ha_mqtt_topic+str(inverter_sn)+"/state/connected","false")
+        result.wait_for_publish()
+        if not result.is_published:
+          print("Error publishing device status for HomeAssistant to MQTT")
+  client.loop_stop()
+  client.disconnect()

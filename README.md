@@ -11,13 +11,11 @@ the register's addresses in the .xml files accordingly and change register start
 *Thanks to @pablolite for HomeAssistant initial code.*
 
 # Required python modules
-To run, script requires following python modules:
 ```
 libscrc
 paho-mqtt
 influxdb
 ```
-
 # Configuration
 
 Edit the config.cfg and enter the following data:
@@ -66,7 +64,7 @@ domoticz_topic=                 # MQTT topic name for Domoticz integration
 
 [HomeAssistant]
 homeassistant_support=0         # 0: disabled, 1: enabled
-homeassistant_topc=             # MQTT topic name for HomeAssistant integration
+homeassistant_topic=            # MQTT topic name for HomeAssistant integration
 
 Files SOFARMap.xml and SOFARHWMap.xml contain MODBUS inverter's registers mapping for Sofar Solar K-TLX product line
 and Prometheus/InfluxDB metrics configuration.
@@ -90,7 +88,6 @@ Example SOFARMap.xml structure and fields definition (similar for SOFARHWMap.xml
         "label_value": "PV1"        # Prometheus/InfluxDB value name
       }
 ```
-
 # Run
 
 ```
@@ -160,7 +157,6 @@ bash:/python3 /InverterHWData.py (or ./InverterHWData.py)
     "DSP Version": "V270"
 }
 ```
-
 # Known Issues
 You tell me :)
 
@@ -186,15 +182,16 @@ If You want to rewrite or/add change anything - please fork Your own project.
        c) create virtual devices in Domoticz (write down their idx numbers)
        d) in SOFARMap.xml find corresponding variables and for each input idx number
        e) leave "DomoticzIdx":0 for variables You don't want to send data to Domoticz
-    3. Tested with Mosquitto MQTT server (both with and without TLS) and Domoticz 2021.1
+    3. Tested with Domoticz 2021.1
 ```
-# HomeAssistant (via MQTT) Support (prepared/tested by @pablolite, optimized by Michalux)
+# HomeAssistant (via MQTT) Support
 ```
     1. Requires MQTT configuration in config.cfg (see section MQTT Support)
     2. To turn HomeAssistant support on:
         a) enable it in config.cfg
         b) set ha_mqtt_topic in config.cfg
     3. Hardcoded auto-discovery MQTT topic name: homeassistant/sensor/SofarLogger/{Inverter's SN}_ID/config
+    4. Code prepared/tested by @pablolite, optimized by Michalux
 ```
 # Prometheus+Grafana support
 ```
@@ -204,7 +201,6 @@ Steps to run Prometheus+Grafana support:
     3. Configure prometheus target to access the file 
     4. Add Prometheus datasource in Grafana
     5. Import grafana_en/pl.json file (Dashboards->Manage->Import).
-    Enjoy :)
 ```
 # InfluxDB+Grafana support
 ```
@@ -213,5 +209,5 @@ Steps to run InfluxDB+Grafana support:
     2. Create database to store inverter data in InfluxDB (i.e. create database Data)
     3. Add InfluxDB datasource in Grafana (name it InfluxDB)
     4. Import grafana_iflux_en/pl.json file (Dashboards->Manage->Import).
-    Enjoy :)
 ```
+Enjoy :)
