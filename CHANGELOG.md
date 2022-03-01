@@ -173,3 +173,13 @@ Fixes, code refactoring and clean-ups
 
 ### Fixed
 1. Sending offline status to MQTT (basic, Domoticz, HomeAssistant)
+
+## [1.83] - 2022-03-01
+Fix
+
+### Added
+
+### Changed
+
+### Fixed
+1. Small fix for potential charmap_decode error (especially in Windows environment)

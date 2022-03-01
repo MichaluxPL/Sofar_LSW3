@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # Script gathering solar data from Sofar Solar Inverter (K-TLX) via logger module LSW-3/LSE
 # by Michalux (based on DEYE script by jlopez77, HA initial code by pablolite).
-# Version: 1.82
+# Version: 1.83
 #
 
 import sys
@@ -152,10 +152,10 @@ if invstatus==1:
       checksum += frame_bytes[i] & 255
     frame_bytes[len(frame_bytes) - 2] = int((checksum & 255))
 
+    # SEND DATA
     if verbose=="1":
       print("*** Chunk no: ", chunks);
       print("Sent data: ", frame);
-    # SEND DATA
     clientSocket.sendall(frame_bytes);
 
     ok=False;
@@ -182,7 +182,7 @@ if invstatus==1:
         p2=60+(a*4)
         hexpos=str("0x") + str(hex(a+pini)[2:].zfill(4)).upper()
         response=twosComplement_hex(str(''.join(hex(ord(chr(x)))[2:].zfill(2) for x in bytearray(data))+'  '+re.sub('[^\x20-\x7f]', '', ''))[p1:p2], hexpos)
-        with open("./SOFARMap.xml") as txtfile:
+        with open("./SOFARMap.xml", encoding="utf-8") as txtfile:
           parameters=json.loads(txtfile.read())
         for parameter in parameters:
           for item in parameter["items"]:
@@ -336,7 +336,7 @@ if mqtt==1:
         if not result.is_published:
           print("Error publishing device status to MQTT")
       if DomoticzSupport=="1":
-        with open("./SOFARMap.xml") as txtfile:
+        with open("./SOFARMap.xml", encoding="utf-8") as txtfile:
           parameters=json.loads(txtfile.read())
         result=client.publish(domoticz_mqtt_topic, "{ \"idx\": "+str(parameters[2]['items'][0]['DomoticzIdx'])+", \"svalue\": \"Off\" }", retain=True)
         result.wait_for_publish()
