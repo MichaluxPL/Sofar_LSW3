@@ -76,7 +76,7 @@
             "properties": [
               {
                 "id": "unit",
-                "value": "hours"
+                "value": "hores"
               },
               {
                 "id": "color",
@@ -135,7 +135,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Current power"
+              "options": "Potència actual"
             },
             "properties": [
               {
@@ -210,7 +210,7 @@
           "tags": []
         },
         {
-          "alias": "Producció màxima diaria",
+          "alias": "Producció total",
           "groupBy": [
             {
               "params": [
@@ -416,7 +416,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Power"
+              "options": "Potència"
             },
             "properties": [
               {
@@ -734,7 +734,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Production"
+              "options": "Producció"
             },
             "properties": [
               {
@@ -822,7 +822,7 @@
             "mode": "palette-classic"
           },
           "custom": {
-            "axisLabel": "Generated energy",
+            "axisLabel": "Energia generada",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "bars",
@@ -871,7 +871,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Production"
+              "options": "Producció"
             },
             "properties": [
               {
@@ -963,7 +963,7 @@
             "mode": "palette-classic"
           },
           "custom": {
-            "axisLabel": "Gerated energy",
+            "axisLabel": "Energia generada",
             "axisPlacement": "auto",
             "axisSoftMin": 0,
             "barAlignment": 0,
@@ -1013,7 +1013,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Production"
+              "options": "Producció"
             },
             "properties": [
               {
