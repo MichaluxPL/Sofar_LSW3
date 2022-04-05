@@ -119,7 +119,7 @@ bash:/python3 InverterData.py  (or ./InverterData.py)
     "Today production (kWh)": 14010.0,
     "Today generation time (min)": 679,
     "Inverter module temperature (ºC)": 29,
-    "Inverter inner termperature (ºC)": 45,
+    "Inverter inner temperature (ºC)": 45,
     "Inverter bus voltage (V)": 655.8,
     "PV1 voltage sample by slave CPU (V)": 402.6,
     "PV1 current sample by slave CPU (A)": 79.1,
