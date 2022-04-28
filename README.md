@@ -165,8 +165,8 @@ Feel free to suggest :)
 If You want to rewrite or/add change anything - please fork Your own project.
 
 # FAQ
+```
 Q: I get "No value in response for register 0x0001"
-
 A: Most probable causes for this: 
   a) Your Inverter keeps it's production data in a different registers than current default.
      What You can do is:
@@ -177,13 +177,12 @@ A: Most probable causes for this:
      b'\xa5c\x00\x10\x15\x00%l\x90Pi\x02\x014\x92R7(\x19\x00\x00\xc6\x9b\x17+\x01\x03P\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11y\x00\xd8\x03$\x00\x00\x00`\x00\x00\x00Y\xff\xc0\x13\x86\tq\x00\x9a\tN\x00\x9b\t\x81\x00\x9a\x00\x00\x07\xcb\x00\x00\t\x86\x00\x8c\x00\xa8\x00\x1d\x00,\x19\xcd\x11g\x032\x00<\x00\x00\x00\x01\x00\x00\x05M\t\x97\x07\xb9\x00\x0c\x98I\xff\x15'
 
 Q: I've changed register's numbers in config.cfg, but received data does not match parameter's names
-
 A: You have to update those numbers in SOFARMap.xml to match parameter's names.
    Important: Changing register's numbers may require some fix in the code for values kept in more than one register (i.e. 2 byte values)
 
 Q: Sometimes I get wrong values (i.e. negative)
-
 A: Unfortunately logger is not bug free :( so it can happen from time to time.
+```
 
 # MQTT Support
 ```
