@@ -307,7 +307,7 @@
           {
             "key": 4,
             "valueEN": "Permanent",
-            "valuePL": "Permanent"
+            "valuePL": "Usterka nie do naprawienia"
           }
 
         ],
@@ -334,7 +334,7 @@
         "label_value": "Module"        
       },
       {
-        "titleEN": "Inverter inner temperature",
+        "titleEN": "Inverter inner termperature",
         "titlePL": "Temperatura falownika",
         "registers": ["0x001C"],
         "DomoticzIdx": 0,
