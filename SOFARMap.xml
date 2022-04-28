@@ -334,7 +334,7 @@
         "label_value": "Module"        
       },
       {
-        "titleEN": "Inverter inner termperature",
+        "titleEN": "Inverter inner temperature",
         "titlePL": "Temperatura falownika",
         "registers": ["0x001C"],
         "DomoticzIdx": 0,
