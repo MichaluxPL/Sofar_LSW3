@@ -183,3 +183,14 @@ Fix
 
 ### Fixed
 1. Small fix for potential charmap_decode error (especially in Windows environment)
+
+## [1.84] - 2022-04-29
+Report 0 if logger/inverter is offline
+
+### Added
+
+### Changed
+Now script reports 0 for all monitored parameters if logger/inverter is offline.
+It helps getting more acurate data agregations (i.e. in Grafana)
+
+### Fixed

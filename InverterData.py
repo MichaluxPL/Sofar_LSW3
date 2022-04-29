@@ -18,7 +18,7 @@ from influxdb import InfluxDBClient
 from datetime import datetime
 
 def twosComplement_hex(hexval, reg):
-  if hexval=="":
+  if hexval=="" or (" " in hexval):
     print("No value in response for register "+reg)
     print("Check register start/end values in config.cfg")
     sys.exit(1)
@@ -259,10 +259,22 @@ if prometheus=="1" and invstatus==1:
     if verbose=="1": print(PMData[i]);
   prometheus_file.close();
 
-# Write data to Influx DB
+# Write data to Influx DB (if offline - write 0 for each parameter)
 if influxdb=="1" and invstatus==1:
   Write2InfluxDB(InfluxData)
-  if verbose=="1": print("Influx data: ",InfluxData);
+  if verbose=="1": print("Influx data: ", json.dumps(InfluxData, indent=4, sort_keys=False, ensure_ascii=False));
+if influxdb=="1" and invstatus==0:
+  with open("./SOFARMap.xml", encoding="utf-8") as txtfile:
+    parameters=json.loads(txtfile.read())
+  for parameter in parameters:
+    for item in parameter["items"]:
+      metric_name=item["metric_name"]
+      label_name=item["label_name"]
+      label_value=item["label_value"]
+      graph=item["graph"]
+      if graph==1: PrepareInfluxData(InfluxData, metric_name.split('_')[0]+"_"+label_value, 0);
+  Write2InfluxDB(InfluxData)
+  if verbose=="1": print("Influx data: ", json.dumps(InfluxData, indent=4, sort_keys=False, ensure_ascii=False))
 
 # MQTT integration (Domoticz, HA, pure MQTT)
 if mqtt==1:

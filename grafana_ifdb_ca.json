@@ -793,7 +793,7 @@
           "measurement": "InverterData",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT difference(max(\"SolarProduction_Today\")) FROM \"InverterData\" WHERE $timeFilter GROUP BY time(30m) fill(null)",
+          "query": "SELECT non_negative_difference(max(\"SolarProduction_Today\")) FROM \"InverterData\" WHERE $timeFilter GROUP BY time(30m) fill(0)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
