@@ -190,7 +190,7 @@ Report 0 if logger/inverter is offline
 ### Added
 
 ### Changed
-Now script reports 0 for all monitored parameters if logger/inverter is offline.
+Now script writes 0 to InfluxDB for all monitored parameters if logger/inverter is offline
 It helps getting more acurate data agregations (i.e. in Grafana)
 
 ### Fixed
