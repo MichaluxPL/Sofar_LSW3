@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # Script gathering solar data from Sofar Solar Inverter (K-TLX) via logger module LSW-3/LSE
 # by Michalux (based on DEYE script by jlopez77, HA initial code by pablolite).
-# Version: 1.83
+# Version: 1.84
 #
 
 import sys
