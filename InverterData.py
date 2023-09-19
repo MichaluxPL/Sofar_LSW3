@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # Script gathering solar data from Sofar Solar Inverter (K-TLX) via logger module LSW-3/LSE
 # by Michalux (based on DEYE script by jlopez77, HA initial code by pablolite).
-# Version: 1.84
+# Version: 1.83
 #
 
 import sys
@@ -244,16 +244,32 @@ if invstatus==1:
       if chunks==0:
         pini=reg_start2
         pfin=reg_end2
-      chunks+=1
+    chunks+=1
 output=output[:-1]+"}"
 if invstatus>0:
   jsonoutput=json.loads(output)
   print("*** JSON output:")
   print(json.dumps(jsonoutput, indent=4, sort_keys=False, ensure_ascii=False))
 
-# Write data to a prometheus integration file
+# Write data to a prometheus integration file (if offline - write 0 for each parameter)
 if prometheus=="1" and invstatus==1:
   prometheus_file = open(prometheus_file, "w");
+  for i in range(0, len(PMData)):
+    prometheus_file.write(PMData[i])
+    if verbose=="1": print(PMData[i]);
+  prometheus_file.close();
+if prometheus=="1" and invstatus==0:
+  prometheus_file = open(prometheus_file, "w");
+  with open("./SOFARMap.xml", encoding="utf-8") as txtfile:
+    parameters=json.loads(txtfile.read())
+  for parameter in parameters:
+    for item in parameter["items"]:
+      metric_name=item["metric_name"]
+      metric_type=item["metric_type"]
+      label_name=item["label_name"]
+      label_value=item["label_value"]
+      graph=item["graph"]
+      if graph==1: PMetrics(metric_name, metric_type, label_name, label_value, 0);
   for i in range(0, len(PMData)):
     prometheus_file.write(PMData[i])
     if verbose=="1": print(PMData[i]);
