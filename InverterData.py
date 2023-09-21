@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # Script gathering solar data from Sofar Solar Inverter (K-TLX) via logger module LSW-3/LSE
 # by Michalux (based on DEYE script by jlopez77, HA initial code by pablolite).
-# Version: 1.83
+# Version: 1.9
 #
 
 import sys
@@ -14,8 +14,9 @@ import paho.mqtt.client as paho
 import os
 import configparser
 import datetime
-from influxdb import InfluxDBClient
 from datetime import datetime
+import influxdb_client
+from influxdb_client.client.write_api import SYNCHRONOUS
 
 def twosComplement_hex(hexval, reg):
   if hexval=="" or (" " in hexval):
@@ -39,7 +40,7 @@ def PrepareInfluxData(IfData, fieldname, fieldvalue):
   return IfData
 
 def Write2InfluxDB(IfData):
-  ifclient.write_points(IfData);
+  influxdb_api.write(ifbucket, iforg, IfData)
 
 def PrepareDomoticzData(DData, idx, svalue):
   if isinstance(svalue, str):
@@ -47,6 +48,13 @@ def PrepareDomoticzData(DData, idx, svalue):
   else:
     DData.append('{ "idx": '+str(idx)+', "svalue": "'+ str(svalue) +'" }')
   return DData
+
+def Write2LogFile(log, text):
+  log.write(localtimestamp+": "+text+"\n")
+
+def WriteDebug(log, text):
+  if debug=="1":
+    log.write(localtimestamp+": "+text+"\n")
 
 os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
 
@@ -75,14 +83,15 @@ mqtt_tls_ver=int(configParser.get('MQTT', 'mqtt_tls_version'))
 mqtt_cacert=configParser.get('MQTT', 'mqtt_cacert')
 lang=configParser.get('SofarInverter', 'lang')
 verbose=configParser.get('SofarInverter', 'verbose')
+debug=configParser.get('SofarInverter', 'debug')
+config_logfile=configParser.get('SofarInverter', 'log_file')
 prometheus=configParser.get('Prometheus', 'prometheus')
 prometheus_file=configParser.get('Prometheus', 'prometheus_file')
 influxdb=configParser.get('InfluxDB', 'influxdb')
-ifhost=configParser.get('InfluxDB', 'influxdb_host')
-ifport=configParser.get('InfluxDB', 'influxdb_port')
-ifuser=configParser.get('InfluxDB', 'influxdb_user')
-ifpass=configParser.get('InfluxDB', 'influxdb_password')
-ifdb=configParser.get('InfluxDB', 'influxdb_dbname')
+ifurl=configParser.get('InfluxDB', 'influxdb_url')
+ifbucket=configParser.get('InfluxDB', 'influxdb_bucket')
+iforg=configParser.get('InfluxDB', 'influxdb_org')
+iftoken=configParser.get('InfluxDB', 'influxdb_token')
 DomoticzSupport=configParser.get('Domoticz', 'domoticz_support')
 domoticz_mqtt_topic=configParser.get('Domoticz', 'domoticz_mqtt_topic')
 HomeAssistantSupport=configParser.get('HomeAssistant', 'homeassistant_support')
@@ -90,10 +99,15 @@ ha_mqtt_topic=configParser.get('HomeAssistant', 'ha_mqtt_topic')
 # END CONFIG
 
 timestamp=str(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
+localtimestamp=str(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+
+logfile = open(config_logfile, "a")
 
 # Initialise InfluxDB support
 if influxdb=="1":
-  ifclient = InfluxDBClient(ifhost,ifport,ifuser,ifpass,ifdb);
+  WriteDebug(logfile, "Initialising InfluxDB connection")
+  ifclient = influxdb_client.InfluxDBClient(url=ifurl, token=iftoken, org=iforg)
+  influxdb_api = ifclient.write_api(write_options=SYNCHRONOUS)
   InfluxData=[
     {
       "measurement": "InverterData",
@@ -116,19 +130,24 @@ invstatus=1
 
 # OPEN CONNECTION TO LOGGER
 if verbose=="1": print("Connecting to logger... ", end='');
+WriteDebug(logfile, "Opening connection to logger")
 for res in socket.getaddrinfo(inverter_ip, inverter_port, socket.AF_INET, socket.SOCK_STREAM):
   family, socktype, proto, canonname, sockadress = res
   try:
-    clientSocket= socket.socket(family, socktype, proto);
+    clientSocket=socket.socket(family, socktype, proto);
     clientSocket.settimeout(10);
     clientSocket.connect(sockadress);
   except socket.error as msg:
     print("Could not open socket - inverter/logger turned off");
+    Write2LogFile(logfile, "Could not open socket - inverter/logger turned off")
     invstatus=0;
 
+if verbose=="1" and invstatus==1:
+  print("connected successfully !");
+  WriteDebug(logfile, "Inverter connected successfully !")
 if invstatus==1:
-  if verbose=="1": print("connected successfully !");
   while chunks<2:
+    WriteDebug(logfile, "Gathering data from the inverter. Chunks loop nr: "+str(chunks+1))
     # Data frame begin
     start = binascii.unhexlify('A5') #start
     length=binascii.unhexlify('1700') # datalength
@@ -156,10 +175,13 @@ if invstatus==1:
     if verbose=="1":
       print("*** Chunk no: ", chunks);
       print("Sent data: ", frame);
+    WriteDebug(logfile, "Sending a request to inverter")
     clientSocket.sendall(frame_bytes);
 
+    # RECEIVE DATA
     ok=False;
     while (not ok):
+      WriteDebug(logfile, "Receiving data from inverter")
       try:
         data = clientSocket.recv(1024);
         ok=True
@@ -167,13 +189,16 @@ if invstatus==1:
           data
         except:
           print("No data - Exit")
+          Write2LogFile(logfile, "No data received ! Exiting.")
           sys.exit(1) #Exit, no data
       except socket.timeout as msg:
         print("Connection timeout - inverter and/or gateway is offline");
+        Write2LogFile(logfile, "Connection timeout - inverter and/or gateway is offline")
         invstatus=0;
 
     if invstatus==1:
       # PARSE RESPONSE (start position 56, end position 60)
+      WriteDebug(logfile, "Parsing received data")
       if verbose=="1": print("Received data: ", data);
       i=pfin-pini
       a=0
@@ -208,6 +233,8 @@ if invstatus==1:
                         invstatus=1
                       else:
                         invstatus=0
+                        chunks+=1
+                        Write2LogFile(logfile, "Inverter not ready to talk. Inverter status code: "+str(response))
                     if lang == "PL":
                       response='"'+option["valuePL"]+'"'
                     else:
@@ -245,31 +272,18 @@ if invstatus==1:
         pini=reg_start2
         pfin=reg_end2
     chunks+=1
+    if chunks>1:
+      WriteDebug(logfile, "Exiting chunks loop")
 output=output[:-1]+"}"
 if invstatus>0:
   jsonoutput=json.loads(output)
   print("*** JSON output:")
   print(json.dumps(jsonoutput, indent=4, sort_keys=False, ensure_ascii=False))
 
-# Write data to a prometheus integration file (if offline - write 0 for each parameter)
+# Write data to a prometheus integration file
 if prometheus=="1" and invstatus==1:
+  WriteDebug(logfile, "Writing data to prometheus")
   prometheus_file = open(prometheus_file, "w");
-  for i in range(0, len(PMData)):
-    prometheus_file.write(PMData[i])
-    if verbose=="1": print(PMData[i]);
-  prometheus_file.close();
-if prometheus=="1" and invstatus==0:
-  prometheus_file = open(prometheus_file, "w");
-  with open("./SOFARMap.xml", encoding="utf-8") as txtfile:
-    parameters=json.loads(txtfile.read())
-  for parameter in parameters:
-    for item in parameter["items"]:
-      metric_name=item["metric_name"]
-      metric_type=item["metric_type"]
-      label_name=item["label_name"]
-      label_value=item["label_value"]
-      graph=item["graph"]
-      if graph==1: PMetrics(metric_name, metric_type, label_name, label_value, 0);
   for i in range(0, len(PMData)):
     prometheus_file.write(PMData[i])
     if verbose=="1": print(PMData[i]);
@@ -277,9 +291,11 @@ if prometheus=="1" and invstatus==0:
 
 # Write data to Influx DB (if offline - write 0 for each parameter)
 if influxdb=="1" and invstatus==1:
+  WriteDebug(logfile, "Writing data to InfluxDB")
   Write2InfluxDB(InfluxData)
   if verbose=="1": print("Influx data: ", json.dumps(InfluxData, indent=4, sort_keys=False, ensure_ascii=False));
 if influxdb=="1" and invstatus==0:
+  WriteDebug(logfile, "Writing empty data to InfluxDB")
   with open("./SOFARMap.xml", encoding="utf-8") as txtfile:
     parameters=json.loads(txtfile.read())
   for parameter in parameters:
@@ -294,6 +310,7 @@ if influxdb=="1" and invstatus==0:
 
 # MQTT integration (Domoticz, HA, pure MQTT)
 if mqtt==1:
+  WriteDebug(logfile, "Writing data to MQTT")
   # Initialise MQTT connection
   client=paho.Client("inverter")
   if mqtt_tls=="1":
@@ -309,8 +326,10 @@ if mqtt==1:
       result.wait_for_publish()
       if result.is_published:
         if verbose=="1": print("*** Data has been succesfully published to MQTT with topic: "+mqtt_topic)
+        WriteDebug(logfile, "Data has been succesfully published to MQTT with topic: "+mqtt_topic)
       else:
         print("Error publishing data to MQTT")
+        Write2LogFile(logfile, "Error publishing data to MQTT")
     # Send data to Domoticz if support enabled
     if DomoticzSupport=="1":
       if verbose=="1": print("*** MQTT messages for Domoticz:");
@@ -320,6 +339,7 @@ if mqtt==1:
         result.wait_for_publish()
         if not result.is_published:
           print("Error publishing data for Domoticz to MQTT")
+          Write2LogFile(logfile, "Error publishing data for Domoticz to MQTT")
     # Send data to HomeAssistant if support enabled
     if HomeAssistantSupport=="1":
       if verbose=="1": print("*** MQTT messages for HomeAssistant:");
@@ -330,11 +350,13 @@ if mqtt==1:
       result.wait_for_publish()
       if not result.is_published:
         print("Error publishing device status for HomeAssistant to MQTT")
+        Write2LogFile(logfile, "Error publishing data for HomeAssistant to MQTT")
       # Send state of the device: connected = true
       result=client.publish(ha_mqtt_topic+str(inverter_sn)+"/state/connected","true")
       result.wait_for_publish()
       if not result.is_published:
         print("Error publishing device state for HomeAssistant to MQTT")
+        Write2LogFile(logfile, "Error publishing data for HomeAssistant to MQTT")
       HAcount=0
       for mqtt_data in HomeAssistantData:
         # Sensors for ENERGY module with kWh, Wh, W
@@ -348,6 +370,7 @@ if mqtt==1:
         result.wait_for_publish()
         if not result.is_published:
           print("[",str(HAcount),"]", "Error publishing data for HomeAssistant to MQTT")
+          Write2LogFile(logfile, "Error publishing data for HomeAssistant to MQTT")
         else:
           if verbose=="1": print("[",str(HAcount),"]", mqtt_data[0], ": ", mqtt_data[7]);
         # Send sensor values data
@@ -355,6 +378,7 @@ if mqtt==1:
         result.wait_for_publish()
         if not result.is_published:
           print("[",str(HAcount),"]","Error publishing data for HomeAssistant to MQTT")
+          Write2LogFile(logfile, "Error publishing data for HomeAssistant to MQTT")
         HAcount+=1
   else:
       # Send offline message
@@ -363,6 +387,7 @@ if mqtt==1:
         result.wait_for_publish()
         if not result.is_published:
           print("Error publishing device status to MQTT")
+          Write2LogFile(logfile, "Error publishing device status to MQTT")
       if DomoticzSupport=="1":
         with open("./SOFARMap.xml", encoding="utf-8") as txtfile:
           parameters=json.loads(txtfile.read())
@@ -370,10 +395,15 @@ if mqtt==1:
         result.wait_for_publish()
         if not result.is_published:
           print("Error publishing device status for Domoticz to MQTT")
+          Write2LogFile(logfile, "Error publishing device status for Domoticz to MQTT")
       if HomeAssistantSupport=="1":
         result=client.publish(ha_mqtt_topic+str(inverter_sn)+"/state/connected","false")
         result.wait_for_publish()
         if not result.is_published:
           print("Error publishing device status for HomeAssistant to MQTT")
+          Write2LogFile(logfile, "Error publishing device status for HomeAssistant to MQTT")
   client.loop_stop()
   client.disconnect()
+clientSocket.close()
+WriteDebug(logfile, "Script end")
+logfile.close()

@@ -32,6 +32,8 @@ registerhw_start=0x2000         # Like above, but for InverterHWData.py
 registerhw_end=0x200D           # Like above, but for InverterHWData.py
 lang=                           # Output language (available: PL,EN)
 verbose=0                       # Set to 1 for additional info to be presented (registers, binary packets etc.)
+debug=0                         # Set to 1 to log additional debug data to a log file
+log_file=InverterData.log       # Log file name with a path
 
 [Prometheus]
 prometheus=0                    # set to 1 to export data in Prometheus metrics format
@@ -39,6 +41,12 @@ prometheus_file=/xx/xx/metrics/index.html  # Path to Prometheus metrics file ser
 
 [InfluxDB]
 influxdb=0                      # set to 1 to export data to InfluxDB
+influxdb_url=http://x.x.x.x:8086 #InfluxDB server access URL
+influxdb_bucket=SolarData       # InfluxDB bucket to store Inverter's data
+influxdb_org=                   # InfluxDB organization
+influxdb_token=                 # InfluxDB access token
+
+[InfluxDB]
 influxdb_host=                  # InfluxDB host (i.e. 127.0.0.1)
 influxdb_port=8086              # InfluxDB port
 influxdb_user=                  # InfluxDB user with permisions to read/write from/to dbname
@@ -229,5 +237,6 @@ Steps to run InfluxDB+Grafana support:
     2. Create database to store inverter data in InfluxDB (i.e. create database Data)
     3. Add InfluxDB datasource in Grafana (name it InfluxDB)
     4. Import grafana_iflux_en/pl.json file (Dashboards->Manage->Import).
+    Important: From version 1.9 the script requires InfluxDB v2.x
 ```
 Enjoy :)
